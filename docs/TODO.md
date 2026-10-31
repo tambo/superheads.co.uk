@@ -20,6 +20,7 @@ Generated from [data/work-items.json](../data/work-items.json). Do not edit this
 | SH-012 | 2 | Restore historical Portfolio and Info copy | todo | Unclaimed | SH-005, SH-006 | 2026-10-31 |
 | SH-013 | 4 | Choose and implement a modern game pilot | todo | Unclaimed | SH-005, SH-008 | 2026-10-31 |
 | SH-014 | 4 | Release accessibility, performance and security review | todo | Unclaimed | SH-004, SH-007, SH-008, SH-012 | 2026-10-31 |
+| SH-015 | 2 | Support display fullscreen on iPhone Safari | todo | Unclaimed | None | 2026-10-31 |
 
 ## Acceptance And Handoff
 
@@ -106,3 +107,9 @@ Scope expansion requires explicit approval.
 Browser/device checks, content/rights, headers/404, media weight, no archive exposure, metadata/indexing and staging approval recorded.
 
 Resolve current local preview dependency audit and review robots/indexing before launch.
+
+### SH-015: Support display fullscreen on iPhone Safari
+
+Fullscreen control works or degrades to a CSS fallback on iPhone Safari while staying native on iPad and desktop; Escape and a visible exit control restore the console; keyboard, reduced motion and tests verified.
+
+iPhone Safari lacks element requestFullscreen; ad-hoc request from tambo.
