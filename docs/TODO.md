@@ -20,7 +20,7 @@ Generated from [data/work-items.json](../data/work-items.json). Do not edit this
 | SH-012 | 2 | Restore historical Portfolio and Info copy | todo | Unclaimed | SH-005, SH-006 | 2026-10-31 |
 | SH-013 | 4 | Choose and implement a modern game pilot | todo | Unclaimed | SH-005, SH-008 | 2026-10-31 |
 | SH-014 | 4 | Release accessibility, performance and security review | todo | Unclaimed | SH-004, SH-007, SH-008, SH-012 | 2026-10-31 |
-| SH-015 | 2 | Support display fullscreen on iPhone Safari | todo | Unclaimed | None | 2026-10-31 |
+| SH-015 | 2 | Support display fullscreen on iPhone Safari | in-progress | tambo | None | 2026-10-31T19:50:44.023Z |
 
 ## Acceptance And Handoff
 
@@ -112,4 +112,4 @@ Resolve current local preview dependency audit and review robots/indexing before
 
 Fullscreen control works or degrades to a CSS fallback on iPhone Safari while staying native on iPad and desktop; Escape and a visible exit control restore the console; keyboard, reduced motion and tests verified.
 
-iPhone Safari lacks element requestFullscreen; ad-hoc request from tambo.
+Fixing iPhone Safari fullscreen

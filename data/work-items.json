@@ -1,19 +1,194 @@
 {
   "tasks": [
-    { "id": "SH-001", "title": "Screenshot-led console and keyboard navigation", "status": "done", "owner": null, "priority": 0, "dependsOn": [], "acceptance": "Static build and keyboard/pointer browser checks pass; original media clearly distinguished from new studies.", "note": "Initial prototype deployed and source published.", "updatedAt": "2026-10-31" },
-    { "id": "SH-002", "title": "Branch deployment implementation", "status": "done", "owner": null, "priority": 0, "dependsOn": [], "acceptance": "Develop/staging and main/production use isolated guarded targets and tests.", "note": "Workflow implemented; external activation tracked separately.", "updatedAt": "2026-10-31" },
-    { "id": "SH-003", "title": "Mac onboarding and shared task coordination", "status": "review", "owner": "tambo", "priority": 1, "dependsOn": [], "acceptance": "Clickable guide, own SSH keys, project tools, task claims and tests; friend verifies setup on her Mac.", "note": "Implementation by Copilot for tambo; real fresh-Mac acceptance still pending.", "updatedAt": "2026-10-31" },
-    { "id": "SH-004", "title": "Activate and verify dev hosting and GitHub deployment", "status": "in-progress", "owner": "tambo", "priority": 1, "dependsOn": ["SH-002"], "acceptance": "Dev DNS/TLS, repository secrets and environment protection verified; staging Actions deployment succeeds before production gate activation.", "note": "User arranging Dreamhost subdomain and access. Do not duplicate hosting changes.", "updatedAt": "2026-10-31" },
-    { "id": "SH-005", "title": "Agree restoration priorities and editorial direction together", "status": "todo", "owner": null, "priority": 1, "dependsOn": [], "acceptance": "Both owners agree priority order, historic versus new content, initial launch scope and review responsibilities.", "note": "Good first collaborative task; no coding required.", "updatedAt": "2026-10-31" },
-    { "id": "SH-006", "title": "Review source assets and publication permissions", "status": "todo", "owner": null, "priority": 1, "dependsOn": [], "acceptance": "Home-only source inventory and rights/author credits reviewed; exact provenance updated; no private archive committed.", "note": "Can be led by a nontechnical collaborator. Broader archive remains out of scope.", "updatedAt": "2026-10-31" },
-    { "id": "SH-007", "title": "Refine console fidelity and mobile controls", "status": "todo", "owner": null, "priority": 2, "dependsOn": ["SH-005"], "acceptance": "Owner-approved screenshot comparison; touch, short screens, keyboard focus and Safari/Firefox verified.", "note": "Preserve display, keyboard bank and layered context menu.", "updatedAt": "2026-10-31" },
-    { "id": "SH-008", "title": "Build reusable display-content player contract", "status": "todo", "owner": null, "priority": 2, "dependsOn": ["SH-005"], "acceptance": "Typed content manifests support video, audio/visual, interactive and unavailable entries; load/error/end/cleanup states tested without backend runtime.", "note": "Foundation before adding playable media; no invented availability.", "updatedAt": "2026-10-31" },
-    { "id": "SH-009", "title": "Restore reviewed music and video content", "status": "todo", "owner": null, "priority": 3, "dependsOn": ["SH-006", "SH-008"], "acceptance": "Approved home-linked media sources, formats/credits, playback controls, user-gesture audio and mobile behavior verified; scope expansion approved if needed.", "note": "Choose a small owner-approved pilot first; legacy Flash never executed.", "updatedAt": "2026-10-31" },
-    { "id": "SH-010", "title": "Expand AV Lab with intentional visual experiences", "status": "todo", "owner": null, "priority": 3, "dependsOn": ["SH-006", "SH-008"], "acceptance": "Clearly labelled original/new studies with parameters, pointer/keyboard controls, reduced motion and performance checks.", "note": "Optional shape filtering should be designed with owners, not assumed to replace console.", "updatedAt": "2026-10-31" },
-    { "id": "SH-011", "title": "Add browser-local favourites", "status": "todo", "owner": null, "priority": 3, "dependsOn": ["SH-008"], "acceptance": "Save/remove, empty state, persistence, corrupt/unavailable storage tested; no account sync claim.", "note": "Works entirely client-side.", "updatedAt": "2026-10-31" },
-    { "id": "SH-012", "title": "Restore historical Portfolio and Info copy", "status": "todo", "owner": null, "priority": 2, "dependsOn": ["SH-005", "SH-006"], "acceptance": "Home-export text and case studies reviewed by owners, dates and historical context explicit, contact availability checked.", "note": "Suitable editorial ownership for the friend with agent help.", "updatedAt": "2026-10-31" },
-    { "id": "SH-013", "title": "Choose and implement a modern game pilot", "status": "todo", "owner": null, "priority": 4, "dependsOn": ["SH-005", "SH-008"], "acceptance": "Owners approve rules/source/rights and established engine; touch/keyboard, lifecycle and score tests pass; legacy code not executed.", "note": "Scope expansion requires explicit approval.", "updatedAt": "2026-10-31" },
-    { "id": "SH-014", "title": "Release accessibility, performance and security review", "status": "todo", "owner": null, "priority": 4, "dependsOn": ["SH-004", "SH-007", "SH-008", "SH-012"], "acceptance": "Browser/device checks, content/rights, headers/404, media weight, no archive exposure, metadata/indexing and staging approval recorded.", "note": "Resolve current local preview dependency audit and review robots/indexing before launch.", "updatedAt": "2026-10-31" },
-  { "id": "SH-015", "title": "Support display fullscreen on iPhone Safari", "status": "todo", "owner": null, "priority": 2, "dependsOn": [], "acceptance": "Fullscreen control works or degrades to a CSS fallback on iPhone Safari while staying native on iPad and desktop; Escape and a visible exit control restore the console; keyboard, reduced motion and tests verified.", "note": "iPhone Safari lacks element requestFullscreen; ad-hoc request from tambo.", "updatedAt": "2026-10-31" }
+    {
+      "id": "SH-001",
+      "title": "Screenshot-led console and keyboard navigation",
+      "status": "done",
+      "owner": null,
+      "priority": 0,
+      "dependsOn": [],
+      "acceptance": "Static build and keyboard/pointer browser checks pass; original media clearly distinguished from new studies.",
+      "note": "Initial prototype deployed and source published.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-002",
+      "title": "Branch deployment implementation",
+      "status": "done",
+      "owner": null,
+      "priority": 0,
+      "dependsOn": [],
+      "acceptance": "Develop/staging and main/production use isolated guarded targets and tests.",
+      "note": "Workflow implemented; external activation tracked separately.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-003",
+      "title": "Mac onboarding and shared task coordination",
+      "status": "review",
+      "owner": "tambo",
+      "priority": 1,
+      "dependsOn": [],
+      "acceptance": "Clickable guide, own SSH keys, project tools, task claims and tests; friend verifies setup on her Mac.",
+      "note": "Implementation by Copilot for tambo; real fresh-Mac acceptance still pending.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-004",
+      "title": "Activate and verify dev hosting and GitHub deployment",
+      "status": "in-progress",
+      "owner": "tambo",
+      "priority": 1,
+      "dependsOn": [
+        "SH-002"
+      ],
+      "acceptance": "Dev DNS/TLS, repository secrets and environment protection verified; staging Actions deployment succeeds before production gate activation.",
+      "note": "User arranging Dreamhost subdomain and access. Do not duplicate hosting changes.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-005",
+      "title": "Agree restoration priorities and editorial direction together",
+      "status": "todo",
+      "owner": null,
+      "priority": 1,
+      "dependsOn": [],
+      "acceptance": "Both owners agree priority order, historic versus new content, initial launch scope and review responsibilities.",
+      "note": "Good first collaborative task; no coding required.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-006",
+      "title": "Review source assets and publication permissions",
+      "status": "todo",
+      "owner": null,
+      "priority": 1,
+      "dependsOn": [],
+      "acceptance": "Home-only source inventory and rights/author credits reviewed; exact provenance updated; no private archive committed.",
+      "note": "Can be led by a nontechnical collaborator. Broader archive remains out of scope.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-007",
+      "title": "Refine console fidelity and mobile controls",
+      "status": "todo",
+      "owner": null,
+      "priority": 2,
+      "dependsOn": [
+        "SH-005"
+      ],
+      "acceptance": "Owner-approved screenshot comparison; touch, short screens, keyboard focus and Safari/Firefox verified.",
+      "note": "Preserve display, keyboard bank and layered context menu.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-008",
+      "title": "Build reusable display-content player contract",
+      "status": "todo",
+      "owner": null,
+      "priority": 2,
+      "dependsOn": [
+        "SH-005"
+      ],
+      "acceptance": "Typed content manifests support video, audio/visual, interactive and unavailable entries; load/error/end/cleanup states tested without backend runtime.",
+      "note": "Foundation before adding playable media; no invented availability.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-009",
+      "title": "Restore reviewed music and video content",
+      "status": "todo",
+      "owner": null,
+      "priority": 3,
+      "dependsOn": [
+        "SH-006",
+        "SH-008"
+      ],
+      "acceptance": "Approved home-linked media sources, formats/credits, playback controls, user-gesture audio and mobile behavior verified; scope expansion approved if needed.",
+      "note": "Choose a small owner-approved pilot first; legacy Flash never executed.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-010",
+      "title": "Expand AV Lab with intentional visual experiences",
+      "status": "todo",
+      "owner": null,
+      "priority": 3,
+      "dependsOn": [
+        "SH-006",
+        "SH-008"
+      ],
+      "acceptance": "Clearly labelled original/new studies with parameters, pointer/keyboard controls, reduced motion and performance checks.",
+      "note": "Optional shape filtering should be designed with owners, not assumed to replace console.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-011",
+      "title": "Add browser-local favourites",
+      "status": "todo",
+      "owner": null,
+      "priority": 3,
+      "dependsOn": [
+        "SH-008"
+      ],
+      "acceptance": "Save/remove, empty state, persistence, corrupt/unavailable storage tested; no account sync claim.",
+      "note": "Works entirely client-side.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-012",
+      "title": "Restore historical Portfolio and Info copy",
+      "status": "todo",
+      "owner": null,
+      "priority": 2,
+      "dependsOn": [
+        "SH-005",
+        "SH-006"
+      ],
+      "acceptance": "Home-export text and case studies reviewed by owners, dates and historical context explicit, contact availability checked.",
+      "note": "Suitable editorial ownership for the friend with agent help.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-013",
+      "title": "Choose and implement a modern game pilot",
+      "status": "todo",
+      "owner": null,
+      "priority": 4,
+      "dependsOn": [
+        "SH-005",
+        "SH-008"
+      ],
+      "acceptance": "Owners approve rules/source/rights and established engine; touch/keyboard, lifecycle and score tests pass; legacy code not executed.",
+      "note": "Scope expansion requires explicit approval.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-014",
+      "title": "Release accessibility, performance and security review",
+      "status": "todo",
+      "owner": null,
+      "priority": 4,
+      "dependsOn": [
+        "SH-004",
+        "SH-007",
+        "SH-008",
+        "SH-012"
+      ],
+      "acceptance": "Browser/device checks, content/rights, headers/404, media weight, no archive exposure, metadata/indexing and staging approval recorded.",
+      "note": "Resolve current local preview dependency audit and review robots/indexing before launch.",
+      "updatedAt": "2026-10-31"
+    },
+    {
+      "id": "SH-015",
+      "title": "Support display fullscreen on iPhone Safari",
+      "status": "in-progress",
+      "owner": "tambo",
+      "priority": 2,
+      "dependsOn": [],
+      "acceptance": "Fullscreen control works or degrades to a CSS fallback on iPhone Safari while staying native on iPad and desktop; Escape and a visible exit control restore the console; keyboard, reduced motion and tests verified.",
+      "note": "Fixing iPhone Safari fullscreen",
+      "updatedAt": "2026-10-31T19:50:44.023Z"
+    }
   ]
 }
