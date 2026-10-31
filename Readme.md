@@ -12,6 +12,8 @@ Before starting work, review the [latest develop TODO board](https://github.com/
 
 Requires Node.js 24.22.2 or newer within Node 24. Use your host's native architecture: ARM64 on Apple Silicon and x64 on Intel. GitHub Actions uses its standard x64 Ubuntu runner. `.node-version`, npm lifecycle checks and CI enforce the supported Node version. Dependencies are pinned through the lockfile.
 
+**Git workflow:** `main` is production-only. Start work in a separate branch/worktree from the latest `origin/develop`; PR changes into `develop`, verify staging, then use a separate reviewed PR to promote to `main`. Never edit or commit directly on `main` or `develop`.
+
 ```bash
 npm ci
 npm run dev -- --port 3100

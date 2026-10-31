@@ -1,5 +1,17 @@
 # Working Together
 
+## Branch Workflow
+
+`main` is production-only and is never an active coding worktree. Both owners and agents start implementation from the latest `origin/develop`, using a dedicated task branch/worktree. Do not commit directly to `main` or `develop`.
+
+1. Check the current worktree with `git status --short` and `git branch --show-current`. Preserve unrelated uncommitted changes.
+2. Fetch `origin/develop` and create a new branch from that ref, for example `git worktree add -b task/short-description /tmp/superheads-task origin/develop`. Work only in that task branch/worktree.
+3. Validate and push the task branch; open a PR targeting `develop`. Do not merge a stale board snapshot over newer develop changes.
+4. After the develop PR passes GitHub build/tests and staging is verified at `dev.superheads.co.uk`, create a separate PR from `develop` to `main`. Production promotion requires explicit owner/release approval and production environment protection.
+5. Never switch, reset, or discard the user's active `main` worktree to begin a task. If the opened workspace is on `main`, stop editing and create a separate develop-based worktree first.
+
+This branch discipline is independent of task claiming. Automated claims remain paused; inspect the board and coordinate with owners conversationally.
+
 ## Work Board: Automated Claims Paused
 
 The roadmap is [TODO on GitHub's develop branch](https://github.com/tambo/superheads.co.uk/blob/develop/docs/TODO.md), backed by [data/work-items.json](../data/work-items.json). A local copy, chat history or main-branch copy can be stale. At the user's request, the Manage Work Board Actions workflow and mandatory claims are paused. Do not open a claim UI or block explicitly requested work waiting for a claim.
