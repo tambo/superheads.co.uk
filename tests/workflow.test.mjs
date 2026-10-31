@@ -9,8 +9,8 @@ test("workflow builds both branches and gates isolated deployment environments",
   assert.deepEqual(document.errors, []);
   const workflow = document.toJS();
   assert.deepEqual(workflow.on.push.branches, ["develop", "main"]);
-  assert.equal(workflow.jobs.build.steps.find(step => step.uses?.startsWith("actions/setup-node@")).with["node-version"], "24");
-  assert.equal(workflow.jobs.deploy.steps.find(step => step.uses?.startsWith("actions/setup-node@")).with["node-version"], "24");
+  assert.equal(workflow.jobs.build.steps.find(step => step.uses?.startsWith("actions/setup-node@")).with["node-version"], "24.22.2");
+  assert.equal(workflow.jobs.deploy.steps.find(step => step.uses?.startsWith("actions/setup-node@")).with["node-version"], "24.22.2");
   assert.equal(workflow.jobs.build["runs-on"], "ubuntu-latest");
   assert.equal(workflow.jobs.deploy["runs-on"], "ubuntu-latest");
   assert.equal(workflow.permissions.contents, "read");
