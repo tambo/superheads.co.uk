@@ -45,7 +45,11 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
     await page.goto("/");
     await expect(page.locator("canvas")).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    expect(await page.locator(".identity img").evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+    const wordmark = page.getByRole("heading", { level: 1, name: "superheads" }).locator("img");
+    await expect(wordmark).toHaveAttribute("src", "/artwork/home/4.svg");
+    await expect(wordmark).toHaveAttribute("width", "145");
+    await expect(wordmark).toHaveAttribute("height", "27");
+    expect(await wordmark.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0 && image.naturalHeight > 0)).toBe(true);
     const variation = await page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
       const pixels = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data;
       return new Set(Array.from(pixels).filter((_, index) => index % 4 === 0)).size;

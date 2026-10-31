@@ -17,7 +17,7 @@ Original exports and inventory are read-only evidence. Keep the archive gitignor
 
 ## Asset Mapping
 
-Exact source, destination, SHA256 and transformation records for eleven derived assets are stored in [the asset manifest](../data/asset-provenance.json). The curation script parses XML, allows only passive vector elements and rejects event handlers, href/style attributes, entities and external resource references. Copies are byte-for-byte; the archive remains untouched. Current UI uses `4.svg` (wordmark) and `18.svg` (world map); remaining reviewed shapes are reserved for later home-only curation. Owner publication clearance remains pending, so this is a local prototype, not a release.
+Exact source, destination, SHA256 and transformation records for eleven derived assets are stored in [the asset manifest](../data/asset-provenance.json). The curation script parses XML, allows only passive vector elements and rejects event handlers, href/style attributes, entities and external resource references. Copies are byte-for-byte; the archive remains untouched. Current UI uses `4.svg` as the exact original wordmark and `18.svg` as the world map; remaining reviewed shapes are reserved for later home-only curation. The system-font wordmark experiment was rejected because it changed the original typeface, kerning and proportions. Owner publication clearance remains pending, so this is a local prototype, not a release.
 
 Screenshot and recording paths under `archive/screenshots` remain gitignored and are not copied into public output. They inform composition and transitions only. AV Lab canvas studies are newly authored code using no extracted video frames and no legacy execution; they must not be described as restored originals.
 

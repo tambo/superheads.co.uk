@@ -78,6 +78,7 @@ Production prototype is live at `https://superheads.co.uk/` as of 2026-10-31. Th
 | 2026-10-30 | Retain static-first, identity-led restoration and read-only untrusted archive boundaries | User requirements; application version, asset selection and media migration remain pending |
 | 2026-10-31 | Implement screenshot-led console and equivalent mouse/keyboard input | 3 state tests, TypeScript, static build/export check and 6 Chromium browser tests passed |
 | 2026-10-31 | Check desktop/mobile rendering and motion | Screenshots at 1440/390/320px, original wordmark rendering, canvas pixel variation, animation, pause and reduced-motion checks passed; Safari and Firefox remain untested |
+| 2026-10-31 | Enforce exact visual fidelity for UI changes | Restored the original `/artwork/home/4.svg` wordmark; browser tests assert source and dimensions at desktop/mobile sizes. Agent guidance now requires exact-reference comparison and user approval before any approximation. |
 | 2026-10-31 | Align local and CI runtime with Node 24 | Set baseline to 24.22.2; full Node 24 build/test validation pending |
 | 2026-10-31 | Pause automated work claims | Removed the GitHub claim action and mandatory claim instructions per user request; revisit later if needed |
 | 2026-10-31 | Enforce Node 24.22.2 across supported platforms | `fnm` project pin, engine range, strict npm preflight/lifecycle checks, native-architecture Mac helper, standard Ubuntu CI; runtime regression tests added |
