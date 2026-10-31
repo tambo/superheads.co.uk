@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useReducer, useRef, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, Maximize, Pause, Play, RotateCcw } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Maximize, Minimize, Pause, Play, RotateCcw } from "lucide-react";
 import { contexts, initialState, consoleReducer, keyboardAction, padKeys } from "../lib/console-state.mjs";
 
 function Visual({ slot, paused, revision }: { slot: number; paused: boolean; revision: number }) {
@@ -67,13 +67,34 @@ function Visual({ slot, paused, revision }: { slot: number; paused: boolean; rev
 
 export default function Collection() {
   const [state, dispatch] = useReducer(consoleReducer, initialState);
-  const [fullscreenError, setFullscreenError] = useState("");
+  const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const displayRef = useRef<HTMLDivElement>(null);
   const context = contexts.find(item => item.id === state.context)!;
   const selected = context.items[state.slot];
 
   useEffect(() => {
+    if (!pseudoFullscreen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [pseudoFullscreen]);
+
+  const enterFullscreen = async () => {
+    const element = displayRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
+    try {
+      if (element?.requestFullscreen) await element.requestFullscreen();
+      else if (element?.webkitRequestFullscreen) element.webkitRequestFullscreen();
+      else setPseudoFullscreen(true);
+    } catch { setPseudoFullscreen(true); }
+  };
+
+  useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && pseudoFullscreen) {
+        event.preventDefault();
+        setPseudoFullscreen(false);
+        return;
+      }
       const target = event.target as HTMLElement | null;
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || target?.closest("input, textarea, select, [contenteditable='true'], [role='textbox']")) return;
       if (event.key === " " && target?.closest("button, a")) return;
@@ -84,7 +105,7 @@ export default function Collection() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state.context]);
+  }, [state.context, pseudoFullscreen]);
 
   const changeContext = (identifier: string) => {
     dispatch({ type: "context", context: identifier });
@@ -102,7 +123,8 @@ export default function Collection() {
       <span className="map-marker" />
     </aside>
     <section className="screen-section" aria-label="Main display">
-      <div className="display" ref={displayRef}>
+      <div className={pseudoFullscreen ? "display pseudo-fullscreen" : "display"} ref={displayRef}>
+        {pseudoFullscreen && <button className="exit-fullscreen" aria-label="Exit fullscreen" title="Exit fullscreen (Escape)" onClick={() => setPseudoFullscreen(false)}><Minimize /></button>}
         {state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
           <span className="eyebrow">{context.label}</span>
           <h2>{selected}</h2>
@@ -114,17 +136,10 @@ export default function Collection() {
         <div>
           <button aria-label={state.paused ? "Play visual" : "Pause visual"} title="Play / pause (Space)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "pause" })}>{state.paused ? <Play /> : <Pause />}</button>
           <button aria-label="Restart visual" title="Restart (R)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>
-          <button aria-label="Fullscreen display" title="Fullscreen display" onClick={async () => {
-            try {
-              if (!displayRef.current?.requestFullscreen) throw new Error("Unavailable");
-              await displayRef.current.requestFullscreen();
-              setFullscreenError("");
-            } catch { setFullscreenError("Fullscreen is unavailable in this browser."); }
-          }}><Maximize /></button>
+          <button aria-label="Fullscreen display" title="Fullscreen display" onClick={enterFullscreen}><Maximize /></button>
         </div>
       </div>
-      {fullscreenError && <p role="status">{fullscreenError}</p>}
-    </section>
+          </section>
     <aside className="navigation">
       <div className="context-tiles">
         {[{ id: "lab", label: "AV Lab" }, { id: "tools", label: "Tools" }, { id: "tv", label: "TV" }].map(item => <button key={item.id} aria-pressed={state.context === item.id} onClick={() => changeContext(item.id)}><ArrowUpRight aria-hidden="true" /><span>{item.label.toUpperCase()}</span></button>)}

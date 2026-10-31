@@ -56,7 +56,7 @@ The app and gitignore are now implemented. Local Git has no commits or remotes. 
 | Escape | Return to AV Lab |
 | Pointer | Click the same controls; move over a study to change its composition |
 
-Empty pads are disabled. Held key repetition, text-entry fields and modifier shortcuts are excluded. System reduced-motion preference freezes automatic animation. Play/pause, restart and fullscreen have labelled icon buttons and tooltips; fullscreen reports browser refusal. No sounds, videos, games, account services or external contact availability are fabricated.
+Empty pads are disabled. Held key repetition, text-entry fields and modifier shortcuts are excluded. System reduced-motion preference freezes automatic animation. Play/pause, restart and fullscreen have labelled icon buttons and tooltips; fullscreen uses the native (or webkit-prefixed) Fullscreen API and, where unavailable (iPhone Safari), a CSS full-viewport fallback with an Exit button and Escape support. The fallback is verified only in emulated Chromium, not on a real iPhone. No sounds, videos, games, account services or external contact availability are fabricated.
 
 ## Verification And Maintenance
 

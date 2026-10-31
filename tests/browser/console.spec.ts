@@ -65,3 +65,22 @@ test("reduced motion is static and native button Space activation is preserved",
   await page.keyboard.press("Space");
   await expect(page.locator(".bank-heading h2")).toHaveText("MUSIC");
 });
+
+test("fullscreen falls back to a CSS mode where the Fullscreen API is missing (iPhone Safari)", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Element.prototype, "requestFullscreen", { value: undefined, configurable: true });
+    Object.defineProperty(Element.prototype, "webkitRequestFullscreen", { value: undefined, configurable: true });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Fullscreen display" }).click();
+  const display = page.locator(".display");
+  await expect(display).toHaveClass(/pseudo-fullscreen/);
+  const box = await display.boundingBox();
+  const size = page.viewportSize()!;
+  expect(box).toMatchObject({ x: 0, y: 0, width: size.width, height: size.height });
+  await page.keyboard.press("Escape");
+  await expect(display).not.toHaveClass(/pseudo-fullscreen/);
+  await page.getByRole("button", { name: "Fullscreen display" }).click();
+  await page.getByRole("button", { name: "Exit fullscreen" }).click();
+  await expect(display).not.toHaveClass(/pseudo-fullscreen/);
+});
