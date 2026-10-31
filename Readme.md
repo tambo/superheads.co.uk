@@ -6,6 +6,9 @@ Read [the project guide](docs/PROJECT-GUIDE.md) for design decisions and control
 
 ## Local Development
 
+New Mac collaborator: open [MAC-SETUP.md](docs/MAC-SETUP.md), then double-click [Setup Superheads.command](Setup%20Superheads.command). Tools and key creation are guided and opt-in; each person uses their own GitHub and Copilot account.
+
+Before starting work, check the [latest shared develop TODO board](https://github.com/tambo/superheads.co.uk/blob/develop/docs/TODO.md) and follow [the claim/handoff guide](docs/COLLABORATION.md). Both owners and agents must confirm remote task ownership before editing. The roadmap, priorities and acceptance criteria are recorded there.
 Requires Node.js >=20.9.0. Dependencies are pinned through the lockfile.
 
 ```bash

@@ -1,0 +1,55 @@
+name: Manage Work Board
+run-name: '${{ github.actor }}: ${{ inputs.action }} ${{ inputs.task }}'
+
+'on':
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task ID from the latest develop TODO board (for example SH-005)'
+        required: true
+        type: string
+      action:
+        description: 'Reserve before editing; send to review before marking done'
+        required: true
+        type: choice
+        options: [claim, note, block, resume, review, done, release]
+      note:
+        description: 'Short public handoff note or PR URL; no passwords or private paths'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: superheads-work-board
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Claim or update task on the latest shared board
+        env:
+          TASK_ACTION: ${{ inputs.action }}
+          TASK_ID: ${{ inputs.task }}
+          TASK_NOTE: ${{ inputs.note }}
+          TASK_ACTOR: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          git pull --ff-only origin develop
+          node scripts/work-board.mjs "$TASK_ACTION"
+          node scripts/work-board.mjs check
+          git config user.name 'superheads-task-bot'
+          git config user.email 'superheads-task-bot@users.noreply.github.com'
+          git add data/work-items.json docs/TODO.md
+          git diff --cached --quiet && exit 0
+          git commit -m "Update shared work board"
+          git push origin HEAD:develop
