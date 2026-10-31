@@ -1,6 +1,6 @@
 name: Build and Deploy Superheads
 
-'on':
+"on":
   push:
     branches: [develop, main]
   workflow_dispatch:
@@ -11,12 +11,12 @@ permissions:
 jobs:
   build:
     name: Verify Static Site
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
           cache: npm
       - run: npm ci
       - run: npm run build
@@ -38,7 +38,7 @@ jobs:
     if: >-
       (github.ref == 'refs/heads/develop' && vars.SUPERHEADS_STAGING_READY == 'true') ||
       (github.ref == 'refs/heads/main' && vars.SUPERHEADS_PRODUCTION_READY == 'true')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
       url: ${{ github.ref == 'refs/heads/main' && 'https://superheads.co.uk' || 'https://dev.superheads.co.uk' }}
@@ -49,7 +49,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
       - uses: actions/download-artifact@v4
         with:
           name: superheads-static
@@ -63,7 +63,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DREAMHOST_SSH_KEY }}
           KNOWN_HOSTS: ${{ secrets.DREAMHOST_KNOWN_HOSTS }}
           DEPLOY_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
-          SUPERHEADS_DEPLOY_APPROVED: 'yes'
+          SUPERHEADS_DEPLOY_APPROVED: "yes"
         run: |
           set -euo pipefail
           : "${DEPLOY_KEY:?Set DREAMHOST_SSH_KEY}"
