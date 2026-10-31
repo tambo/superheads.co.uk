@@ -64,6 +64,8 @@ Use [RELAUNCH-CHECKLIST.md](RELAUNCH-CHECKLIST.md) as the release gate. Record a
 
 ## Decision And Change Record
 
+Branch deployment implementation added on 2026-10-31: `develop` -> `dev.superheads.co.uk`, `main` -> `superheads.co.uk`, with build/test gates and separate environment readiness variables. See [DEPLOYMENT.md](DEPLOYMENT.md). GitHub secrets, environment protection and staging DNS/TLS provisioning remain external setup steps; earlier statements that no workflow exists are superseded. No remote deployment was performed during this setup.
+
 GitHub repository: `git@github.com:tambo/superheads.co.uk.git`, configured as `origin` at the user's request on 2026-10-31. The initial source publication uses `main`; private archive and screenshots, dependencies, build output and local environment files remain excluded. GitHub publishing does not itself deploy the site; no automatic deployment workflow is configured. This supersedes earlier statements that repository remotes and commits are pending.
 
 Production prototype is live at `https://superheads.co.uk/` as of 2026-10-31. The user explicitly requested cleaning the remote root and using their existing backup without creating another. The guarded deploy preserves `.well-known/` and `.dh-diag`, transfers only `out/`, and requires explicit approval. Backup skip is opt-in through `SUPERHEADS_SKIP_BACKUP=yes`; default deployments retain their backup step. HTTPS output, referenced assets, 404 behavior and live keyboard controls were verified. Original media restoration, staging configuration and Git commits/remotes remain pending. This release status supersedes earlier setup-only statements above.

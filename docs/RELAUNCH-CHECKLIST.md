@@ -35,6 +35,8 @@ Use this as a manually reviewed release gate, not evidence that a release has oc
 
 ## Manual Release Gate
 
+Branch workflow and target-isolation checks are implemented; follow [DEPLOYMENT.md](DEPLOYMENT.md) before enabling repository readiness variables. Dev subdomain setup, GitHub secrets/protection and end-to-end Actions verification remain pending. Readiness gates are not evidence of a verified staging release.
+
 - [ ] Have the main agent complete README and deployment implementation separately; review them without copying unrelated site settings.
 - [ ] Independently verify Superheads-only staging and production targets on the shared Dreamhost account; use only `sshorphismuser`, `sshserver`, `sshport` variable names in committed instructions.
 - [ ] Record eventual `develop` staging and `main` production environment setup; do not assume those environments or remote repositories already exist.

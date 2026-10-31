@@ -28,4 +28,6 @@ The project location and description support automatic skill discovery in compat
 
 ## Stop Conditions
 
+For branch-based deployment setup, follow [DEPLOYMENT.md](../../../docs/DEPLOYMENT.md). The workflow maps `develop` to staging and `main` to production, gated initially by repository readiness variables. Publish workflow changes only when requested; do not assume shared-account secrets exist in the new repository. Verify staging hosting and GitHub protection before enabling gates. Local script environment arguments are restricted to `staging` and `production`; tests must cover target separation and protected hosting entries.
+
 Do not publish an asset with unresolved safety or rights concerns. Do not execute legacy code to resolve missing evidence. If artwork, historical behavior, backup verification or a deployment target cannot be established, record the gap and leave that feature or relaunch gate incomplete. A missing runtime feature is not permission to introduce a server backend.

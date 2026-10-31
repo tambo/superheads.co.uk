@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$DEPLOY_TEST_LOG"
+cat >/dev/null
+exit "${DEPLOY_TEST_SSH_EXIT:-0}"

@@ -37,7 +37,7 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 ## Git And Deployment Boundaries
 
 - Local Git initialisation is authorised. Do not create commits, remotes, remote repositories, or push without an explicit request.
-- Deployment is not autonomous. Initially require a manually gated deploy; eventual `develop` staging and `main` production environments remain planned until configured and verified.
+- Branch deployments are implemented in the workflow: `develop` targets `dev.superheads.co.uk`, `main` targets `superheads.co.uk`. Follow [deployment guidance](docs/DEPLOYMENT.md). Repository readiness variables gate initial activation; staging hosting, GitHub secrets and environment protection require configuration and verification. Never enable those gates or perform extra deployments without authorisation.
 - The hosting account is shared with Orphism, but targets must be Superheads-only. Refer to SSH environment variables `sshorphismuser`, `sshserver`, and `sshport`; never record their values or copy another site's deployment settings.
 - Only the generated static `out/` contents may be deployed to the separately verified Superheads target. Preserve `.well-known/`; exclude the archive, source, secrets, and legacy server files.
 - Maintain application, documentation and deployment checks together when their contracts change.

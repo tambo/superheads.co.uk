@@ -2,7 +2,9 @@
   "name": "superheads",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": ">=20.9.0" },
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/check-export.mjs",
@@ -28,7 +30,10 @@
     "@xmldom/xmldom": "^0.8.11",
     "serve": "^14.2.4",
     "sharp": "^0.35.5",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "yaml": "^2.9.1"
   },
-  "overrides": { "compression": "^1.8.2" }
+  "overrides": {
+    "compression": "^1.8.2"
+  }
 }

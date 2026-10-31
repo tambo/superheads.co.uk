@@ -1,0 +1,79 @@
+name: Build and Deploy Superheads
+
+'on':
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Verify Static Site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: npm run typecheck
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Upload verified static output
+        uses: actions/upload-artifact@v4
+        with:
+          name: superheads-static
+          path: out/
+          include-hidden-files: true
+          retention-days: 7
+
+  deploy:
+    name: Deploy to Dreamhost
+    needs: build
+    if: >-
+      (github.ref == 'refs/heads/develop' && vars.SUPERHEADS_STAGING_READY == 'true') ||
+      (github.ref == 'refs/heads/main' && vars.SUPERHEADS_PRODUCTION_READY == 'true')
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+      url: ${{ github.ref == 'refs/heads/main' && 'https://superheads.co.uk' || 'https://dev.superheads.co.uk' }}
+    concurrency:
+      group: superheads-deploy-${{ github.ref_name }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: superheads-static
+          path: out/
+      - name: Verify target, preview and deploy static output
+        shell: bash
+        env:
+          sshorphismuser: ${{ secrets.DREAMHOST_USERNAME }}
+          sshserver: ${{ secrets.DREAMHOST_HOST }}
+          sshport: ${{ secrets.DREAMHOST_PORT }}
+          DEPLOY_KEY: ${{ secrets.DREAMHOST_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DREAMHOST_KNOWN_HOSTS }}
+          DEPLOY_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+          SUPERHEADS_DEPLOY_APPROVED: 'yes'
+        run: |
+          set -euo pipefail
+          : "${DEPLOY_KEY:?Set DREAMHOST_SSH_KEY}"
+          : "${KNOWN_HOSTS:?Set verified DREAMHOST_KNOWN_HOSTS}"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+          eval "$(ssh-agent -s)" >/dev/null
+          trap 'ssh-agent -k >/dev/null' EXIT
+          printf '%s\n' "$DEPLOY_KEY" | ssh-add - >/dev/null 2>&1
+          unset DEPLOY_KEY KNOWN_HOSTS
+          bash scripts/deploy.sh preview "$DEPLOY_ENVIRONMENT"
+          bash scripts/deploy.sh apply "$DEPLOY_ENVIRONMENT"
