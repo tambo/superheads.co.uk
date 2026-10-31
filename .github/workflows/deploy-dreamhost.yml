@@ -11,7 +11,7 @@ permissions:
 jobs:
   build:
     name: Verify Static Site
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,7 +38,7 @@ jobs:
     if: >-
       (github.ref == 'refs/heads/develop' && vars.SUPERHEADS_STAGING_READY == 'true') ||
       (github.ref == 'refs/heads/main' && vars.SUPERHEADS_PRODUCTION_READY == 'true')
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
       url: ${{ github.ref == 'refs/heads/main' && 'https://superheads.co.uk' || 'https://dev.superheads.co.uk' }}

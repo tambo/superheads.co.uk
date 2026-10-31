@@ -11,8 +11,8 @@ test("workflow builds both branches and gates isolated deployment environments",
   assert.deepEqual(workflow.on.push.branches, ["develop", "main"]);
   assert.equal(workflow.jobs.build.steps.find(step => step.uses?.startsWith("actions/setup-node@")).with["node-version"], "24");
   assert.equal(workflow.jobs.deploy.steps.find(step => step.uses?.startsWith("actions/setup-node@")).with["node-version"], "24");
-  assert.equal(workflow.jobs.build["runs-on"], "ubuntu-24.04-arm");
-  assert.equal(workflow.jobs.deploy["runs-on"], "ubuntu-24.04-arm");
+  assert.equal(workflow.jobs.build["runs-on"], "ubuntu-latest");
+  assert.equal(workflow.jobs.deploy["runs-on"], "ubuntu-latest");
   assert.equal(workflow.permissions.contents, "read");
   assert.equal(workflow.jobs.deploy.needs, "build");
   assert(workflow.jobs.deploy.if.includes("vars.SUPERHEADS_STAGING_READY == 'true'"));

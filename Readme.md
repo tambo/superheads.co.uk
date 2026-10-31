@@ -10,7 +10,7 @@ New Mac collaborator: open [MAC-SETUP.md](docs/MAC-SETUP.md), then double-click 
 
 Before starting work, review the [latest develop TODO board](https://github.com/tambo/superheads.co.uk/blob/develop/docs/TODO.md) and coordinate with the human if a task is already active. Automated work claims are paused; see [COLLABORATION.md](docs/COLLABORATION.md).
 
-Requires Apple Silicon and ARM64 Node.js 24.22.2 or newer within Node 24. `.node-version`, npm lifecycle checks, and ARM64 CI runners enforce this. Dependencies are pinned through the lockfile.
+Requires Node.js 24.22.2 or newer within Node 24. Use your host's native architecture: ARM64 on Apple Silicon and x64 on Intel. GitHub Actions uses its standard x64 Ubuntu runner. `.node-version`, npm lifecycle checks and CI enforce the supported Node version. Dependencies are pinned through the lockfile.
 
 ```bash
 npm ci

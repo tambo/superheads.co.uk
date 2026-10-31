@@ -7,9 +7,9 @@
 | `develop` | `staging` | `dev.superheads.co.uk` | `SUPERHEADS_STAGING_READY` |
 | `main` | `production` | `superheads.co.uk` | `SUPERHEADS_PRODUCTION_READY` |
 
-The workflow in [.github/workflows/deploy-dreamhost.yml](../.github/workflows/deploy-dreamhost.yml) builds and tests each push before uploading a static artifact. Deployment requires the matching repository variable to equal `true`. Keep the staging variable unset until Dreamhost setup is complete. Both variables are initially unset, so publishing this workflow does not replace either site.
+The workflow in [.github/workflows/deploy-dreamhost.yml](../.github/workflows/deploy-dreamhost.yml) builds and tests each push with Node 24 on GitHub's standard x64 Ubuntu runner before uploading a static artifact. Local Apple Silicon development uses native ARM64 Node; Intel Macs use native x64 Node. Deployment requires the matching repository variable to equal `true`. Keep the staging variable unset until Dreamhost setup is complete. Both variables are initially unset, so publishing this workflow does not replace either site.
 
-Only the two exact domain directories are allowed. The remote check rejects missing directories, root symlinks, unexpected physical paths and nested symlinks other than protected hosting entries. The script does not create a missing hosting directory. It preserves `.well-known/` and `.dh-diag` and uses `rsync --delete` only inside the verified target. It never deploys to Orphism.
+Only the two exact domain directories are allowed. The remote check rejects missing directories, root symlinks, unexpected physical paths and nested symlinks other than protected hosting entries. The script does not create a missing hosting directory. It preserves `.well-known/` and `.dh-diag` and uses `rsync --delete` only inside the verified target. It never deploys to Orphism. DreamHost serves static export files only; it does not need a Node installation or Node runtime.
 
 ## GitHub Configuration
 

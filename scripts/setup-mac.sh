@@ -45,6 +45,7 @@ if [[ "$os" == Darwin ]]; then
 fi
 case "$native" in
   arm64) node_arch=arm64 ;;
+  x86_64) node_arch=x64 ;;
   *) node_arch=unsupported ;;
 esac
 
@@ -55,10 +56,6 @@ if [[ "$os" != Darwin ]]; then
   printf 'This guided installer supports macOS only.\n'
   ready=0
 fi
-if [[ "$native" != arm64 ]]; then
-  printf 'This project requires an Apple Silicon Mac running arm64. Intel Macs are not supported.\n'
-  ready=0
-fi
 if [[ "$translated" == 1 ]]; then
   printf 'Rosetta detected. Quit Terminal/VS Code, disable Open using Rosetta in Finder Get Info, and reopen natively.\n'
   ready=0
@@ -67,7 +64,7 @@ if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
   if node -e 'const [major, minor, patch] = process.versions.node.split(".").map(Number); const [pinMajor, pinMinor, pinPatch] = process.argv[1].split(".").map(Number); process.exit(major === pinMajor && (minor > pinMinor || (minor === pinMinor && patch >= pinPatch)) && process.arch === process.argv[2] ? 0 : 1)' "$PIN" "$node_arch"; then
     printf 'Node: suitable native Node 24 (%s).\n' "$(node --version)"
   else
-    printf 'Node: unsuitable version or architecture. Need arm64 Node %s or newer within 24.x.\n' "$PIN"
+    printf 'Node: unsuitable version or architecture. Need Node %s or newer within 24.x, matching native architecture %s.\n' "$PIN" "$node_arch"
     ready=0
   fi
 else

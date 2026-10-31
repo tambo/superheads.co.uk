@@ -85,9 +85,8 @@ test('keys, architecture and launcher preserve the safety contract', () => {
   assert.match(source, /pbcopy < "\$KEY\.pub"/);
   assert.match(source, /"\$created_key" == 1 && -f "\$KEY\.pub"/);
   assert.match(source, /sysctl\.proc_translated/);
-  assert.match(source, /This project requires an Apple Silicon Mac running arm64/);
-  assert.match(source, /Need arm64 Node %s or newer within 24\.x/);
-  assert.doesNotMatch(source, /x86_64\) node_arch=x64/);
+  assert.match(source, /x86_64\) node_arch=x64/);
+  assert.match(source, /matching native architecture %s/);
   assert.match(source, /process\.arch === process\.argv\[2\]/);
   assert.match(source, /major === pinMajor/);
   assert.match(launcherSource, /cd -- "\$\(dirname -- "\$0"\)"/);

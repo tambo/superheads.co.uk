@@ -30,7 +30,7 @@ The archive is untrusted: a suspicious obfuscated PHP entry point was discovered
 
 ## Technical Contract
 
-- Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: ARM64 Node.js >=24.22.2 <25; enforced by `.node-version`, npm lifecycle checks and ARM64 CI runners.
+- Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: Node.js >=24.22.2 <25 on macOS, Linux and Windows, with native ARM64 or x64. `.node-version`, npm lifecycle checks and CI enforce the Node version; CI uses standard x64 Ubuntu.
 - Static build: `output: 'export'`, `trailingSlash: true`, `images: { unoptimized: true }`.
 - Deployment: domain root, static `out/` contents only; no subdirectory base path.
 - No API routes, Server Actions, SSR, request-time backend or runtime PHP/ASP/SWF. Build-time rendering and browser-local interactions are allowed.
@@ -80,6 +80,6 @@ Production prototype is live at `https://superheads.co.uk/` as of 2026-10-31. Th
 | 2026-10-31 | Check desktop/mobile rendering and motion | Screenshots at 1440/390/320px, original wordmark rendering, canvas pixel variation, animation, pause and reduced-motion checks passed; Safari and Firefox remain untested |
 | 2026-10-31 | Align local and CI runtime with Node 24 | Set baseline to 24.22.2; full Node 24 build/test validation pending |
 | 2026-10-31 | Pause automated work claims | Removed the GitHub claim action and mandatory claim instructions per user request; revisit later if needed |
-| 2026-10-31 | Enforce ARM64 Node 24.22.2 across the repository | `fnm` project pin, engine range, strict npm preflight/lifecycle checks, Apple Silicon-only setup helper, and Ubuntu ARM64 CI; runtime regression tests added |
+| 2026-10-31 | Enforce Node 24.22.2 across supported platforms | `fnm` project pin, engine range, strict npm preflight/lifecycle checks, native-architecture Mac helper, standard Ubuntu CI; runtime regression tests added |
 
 Add a dated entry for each relevant implementation or scope change; do not mark planned work as completed.
