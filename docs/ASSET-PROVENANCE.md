@@ -1,0 +1,47 @@
+# Superheads Asset Provenance
+
+## Source Baseline
+
+Primary visual evidence: `archive/legacy-site/_export/home`. All 179 original top-level entries were relocated under `archive/legacy-site`; 25,015 files were SHA256-verified against the archived baseline recorded in `archive/inventory.json`. This document records that supplied baseline, not a new verification or a rights clearance.
+
+Original exports and inventory are read-only evidence. Keep the archive gitignored, outside public output, and backed up separately before relaunch. A suspicious obfuscated PHP entry point exists in the legacy material. Never execute archived content or copy private files, credentials, server configurations or legacy runtime files into the restored site.
+
+## Curation Rules
+
+1. Select only artwork necessary for the restoration. Review file type and content without executing legacy code or serving the archive.
+2. For vectors, inspect scripts, event handlers, embedded objects, external URLs and other active content. Sanitise or convert only a derived copy when necessary; keep originals untouched.
+3. Place reviewed home artwork in `public/artwork/home/`, retaining its original numeric filename. Use only the home export until scope is explicitly expanded. Avoid anonymous renaming that breaks traceability.
+4. Record the exact source path relative to the repository, destination, source SHA256, any derived SHA256, transformation and review evidence. Match source hashes to inventory where available.
+5. Record known authorship and publication rights, including unresolved rights. Archive possession is not proof of permission. Do not publish unresolved assets.
+6. Check actual public output: no whole-archive copy, active legacy content, private metadata, secrets or server configuration. Re-review mappings when assets change.
+
+## Asset Mapping
+
+Exact source, destination, SHA256 and transformation records for eleven derived assets are stored in [the asset manifest](../data/asset-provenance.json). The curation script parses XML, allows only passive vector elements and rejects event handlers, href/style attributes, entities and external resource references. Copies are byte-for-byte; the archive remains untouched. Current UI uses `4.svg` (wordmark) and `18.svg` (world map); remaining reviewed shapes are reserved for later home-only curation. Owner publication clearance remains pending, so this is a local prototype, not a release.
+
+Screenshot and recording paths under `archive/screenshots` remain gitignored and are not copied into public output. They inform composition and transitions only. AV Lab canvas studies are newly authored code using no extracted video frames and no legacy execution; they must not be described as restored originals.
+
+| Exact source path | Public destination | Source SHA256 | Derived SHA256 | Transformation | Authorship / rights | Safety review and date | Publication status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+Numeric artwork destinations must retain the source basename. Use the actual hash values from inspection, not placeholders represented as completed verification. Record the reason when an inspected candidate is rejected.
+
+## Historical Content And Media
+
+Track the source of historical text and case studies alongside artwork. Preserve wording and historical context; distinguish editorial clarification from original copy. Do not invent active clients, services, events, availability or working playback.
+
+| Source path / section | Restored page / section | Editorial changes and rationale | Historical context / rights review | Status |
+| --- | --- | --- | --- | --- |
+
+Media migration is pending. Music, video and game files require separate format, safety, rights and browser-compatibility review before publication. SWF is evidence only, never a runtime dependency.
+
+Home-export text references used in the prototype: `texts/7.txt` (tagline), `texts/21.txt` (album title), `texts/31.txt` through `texts/45.txt` (collection labels), `texts/92.txt` (Spak Invaders), `texts/121.txt` through `texts/127.txt` (historical portfolio names), `texts/149.txt` (AV Lab description), `texts/169.txt` through `texts/178.txt` (tools and TV), and `texts/193.txt` through `texts/209.txt` (Info labels and historical contact). Display copy explaining unavailable functionality is new editorial text; original service and playback claims have not been carried forward as current facts.
+
+## Separate Backup Record
+
+Backup completion is pending. Keep backup location details private when sensitive; do not commit credentials or sensitive absolute paths.
+
+| Date | Non-sensitive backup reference | Inventory verification method | Verified count / result | Reviewer |
+| --- | --- | --- | --- | --- |
+
+Verify the separate backup against `archive/inventory.json`, including recorded sizes and SHA256 hashes, and report missing or mismatched files. The original 25,015-file verification does not establish that a later backup is complete. Link the completed evidence from [the relaunch checklist](RELAUNCH-CHECKLIST.md).

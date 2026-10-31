@@ -1,0 +1,79 @@
+[
+  {
+    "source": "archive/legacy-site/_export/home/shapes/4.svg",
+    "destination": "public/artwork/home/4.svg",
+    "sha256": "06ab0b47f61beddb23b1a0edffda4d0d9017f6979248e760b85415530a6a2704",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/11.svg",
+    "destination": "public/artwork/home/11.svg",
+    "sha256": "d54605284832e83a4e4c84f84e88dbe9d12714535c6d20334cec1f62ab8ac220",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/18.svg",
+    "destination": "public/artwork/home/18.svg",
+    "sha256": "9f73a63bd3a29fcba34f725b34f38f0bfe6aa000f137b8c5cbf8ed864ab8b65e",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/23.svg",
+    "destination": "public/artwork/home/23.svg",
+    "sha256": "cecd3952ee5f3522269a22829a81e42d64ae843fdf91e3f3c16677ebdf6d3b47",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/47.svg",
+    "destination": "public/artwork/home/47.svg",
+    "sha256": "18bac6a5641425c1296f3cd82858100d1f8b6ba865519da021fcd6a03f4ef94c",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/54.svg",
+    "destination": "public/artwork/home/54.svg",
+    "sha256": "0401e7ac6d39688cb154f5eed71c7b20ba0a1249c5aad2c1d4b8f53d7c7e6989",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/56.svg",
+    "destination": "public/artwork/home/56.svg",
+    "sha256": "1acdd36c10729663045163ffbf820de3451234f4dcdff4a3b32f745d8b63a9bc",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/66.svg",
+    "destination": "public/artwork/home/66.svg",
+    "sha256": "5351fc8895684669303f9f0b84a3ce8ca7c9aafb822e08a23d63b37590258209",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/70.svg",
+    "destination": "public/artwork/home/70.svg",
+    "sha256": "1951568f699d9385eccf39037885f1c96e241e57c3d9d39d2636a2b4d6ccd793",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/136.svg",
+    "destination": "public/artwork/home/136.svg",
+    "sha256": "8a5cf90c9e20464928e73255a72ffec6ed65505a714c61093329dc822ec6d42e",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  },
+  {
+    "source": "archive/legacy-site/_export/home/shapes/191.svg",
+    "destination": "public/artwork/home/191.svg",
+    "sha256": "2e44802c955983ee739c57b715f437858d9bc8827e518cfdbb89c75785b60199",
+    "transformation": "None; reviewed vector copied byte-for-byte",
+    "rights": "User-supplied original site export; publication clearance pending owner confirmation"
+  }
+]

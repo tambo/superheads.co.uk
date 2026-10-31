@@ -1,0 +1,7 @@
+Options -Indexes
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+<FilesMatch "\.(php|phtml|phar|asp|aspx|swf|fla)$">
+    Require all denied
+</FilesMatch>
