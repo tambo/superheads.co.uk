@@ -182,13 +182,13 @@
     {
       "id": "SH-015",
       "title": "Support display fullscreen on iPhone Safari",
-      "status": "in-progress",
+      "status": "review",
       "owner": "tambo",
       "priority": 2,
       "dependsOn": [],
       "acceptance": "Fullscreen control works or degrades to a CSS fallback on iPhone Safari while staying native on iPad and desktop; Escape and a visible exit control restore the console; keyboard, reduced motion and tests verified.",
-      "note": "Fixing iPhone Safari fullscreen",
-      "updatedAt": "2026-10-31T19:50:44.023Z"
+      "note": "https://github.com/tambo/superheads.co.uk/pull/2",
+      "updatedAt": "2026-10-31T19:53:16.726Z"
     }
   ]
 }
