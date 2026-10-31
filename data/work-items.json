@@ -189,6 +189,17 @@
       "acceptance": "Fullscreen control works or degrades to a CSS fallback on iPhone Safari while staying native on iPad and desktop; Escape and a visible exit control restore the console; keyboard, reduced motion and tests verified.",
       "note": "https://github.com/tambo/superheads.co.uk/pull/2",
       "updatedAt": "2026-10-31T19:53:16.726Z"
+    },
+    {
+      "id": "SH-016",
+      "title": "Revisit automated work-claim coordination",
+      "status": "todo",
+      "owner": null,
+      "priority": 4,
+      "dependsOn": [],
+      "acceptance": "Re-enable a shared claim workflow only after the user requests it and the owners agree on identity, branch protections and concurrency behavior.",
+      "note": "Paused by user on 2026-10-31 because claim UI was blocking progress.",
+      "updatedAt": "2026-10-31"
     }
   ]
 }

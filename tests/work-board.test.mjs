@@ -26,5 +26,5 @@ test("board and actor validation rejects malformed updates", () => {
   validateBoard(board());
   assert.throws(() => updateTask(board(), "claim", "SH-005", "../invalid"));
   assert.throws(() => updateTask(board(), "claim", "SH-005", "collaborator", "note\ncommand"));
-  assert(renderBoard(board()).includes("local copy may be stale"));
+  assert(renderBoard(board()).includes("Automated work claims are paused"));
 });

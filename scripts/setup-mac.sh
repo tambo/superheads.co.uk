@@ -11,7 +11,7 @@ help() {
   printf 'Usage: bash scripts/setup-mac.sh [--help | --check]\n'
   printf 'No arguments: guided, opt-in setup in an interactive terminal.\n'
   printf '%s\n' '--help: show this help; no changes.' '--check: read-only prerequisites; no installs, browser, keys or configuration changes.'
-  printf 'Guide: %s\nNode baseline: %s (native Node 22, this version or newer).\n' "$GUIDE" "$PIN"
+  printf 'Guide: %s\nNode baseline: %s (native Node 24, this version or newer).\n' "$GUIDE" "$PIN"
 }
 
 case "${1:-}" in
@@ -62,9 +62,9 @@ if [[ "$translated" == 1 ]]; then
 fi
 if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
   if node -e 'const [major, minor, patch] = process.versions.node.split(".").map(Number); const [pinMajor, pinMinor, pinPatch] = process.argv[1].split(".").map(Number); process.exit(major === pinMajor && (minor > pinMinor || (minor === pinMinor && patch >= pinPatch)) && process.arch === process.argv[2] ? 0 : 1)' "$PIN" "$node_arch"; then
-    printf 'Node: suitable native Node 22 (%s).\n' "$(node --version)"
+    printf 'Node: suitable native Node 24 (%s).\n' "$(node --version)"
   else
-    printf 'Node: unsuitable version or architecture. Need native Node %s or newer within 22.x (%s).\n' "$PIN" "$node_arch"
+    printf 'Node: unsuitable version or architecture. Need native Node %s or newer within 24.x (%s).\n' "$PIN" "$node_arch"
     ready=0
   fi
 else

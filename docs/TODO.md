@@ -2,7 +2,7 @@
 
 Generated from [data/work-items.json](../data/work-items.json). Do not edit this generated table.
 
-**Before choosing work, view this file on GitHub on the develop branch. Your local copy may be stale.** Claim a task with the Manage Work Board action, wait for success, and verify your owner entry remotely before editing. See [COLLABORATION.md](COLLABORATION.md).
+Review the latest copy on GitHub's develop branch; local or main-branch copies may be stale. Automated work claims are paused by the user. Check active owners and coordinate conversationally before overlapping work. See [COLLABORATION.md](COLLABORATION.md).
 
 | ID | Priority | Task | Status | Owner | Dependencies | Updated |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -21,6 +21,7 @@ Generated from [data/work-items.json](../data/work-items.json). Do not edit this
 | SH-013 | 4 | Choose and implement a modern game pilot | todo | Unclaimed | SH-005, SH-008 | 2026-10-31 |
 | SH-014 | 4 | Release accessibility, performance and security review | todo | Unclaimed | SH-004, SH-007, SH-008, SH-012 | 2026-10-31 |
 | SH-015 | 2 | Support display fullscreen on iPhone Safari | review | tambo | None | 2026-10-31T19:53:16.726Z |
+| SH-016 | 4 | Revisit automated work-claim coordination | todo | Unclaimed | None | 2026-10-31 |
 
 ## Acceptance And Handoff
 
@@ -113,3 +114,9 @@ Resolve current local preview dependency audit and review robots/indexing before
 Fullscreen control works or degrades to a CSS fallback on iPhone Safari while staying native on iPad and desktop; Escape and a visible exit control restore the console; keyboard, reduced motion and tests verified.
 
 https://github.com/tambo/superheads.co.uk/pull/2
+
+### SH-016: Revisit automated work-claim coordination
+
+Re-enable a shared claim workflow only after the user requests it and the owners agree on identity, branch protections and concurrency behavior.
+
+Paused by user on 2026-10-31 because claim UI was blocking progress.

@@ -64,7 +64,7 @@ Use [RELAUNCH-CHECKLIST.md](RELAUNCH-CHECKLIST.md) as the release gate. Record a
 
 ## Decision And Change Record
 
-Collaboration setup added on 2026-10-31: [MAC-SETUP.md](MAC-SETUP.md) and the clickable launcher guide a collaborator through native Node 22, Git, VS Code, her own GitHub SSH key and Copilot sign-in. Installations are opt-in; no shared keys or global profile copying. The [shared roadmap](TODO.md) and [COLLABORATION.md](COLLABORATION.md) define the latest remote develop board as authoritative for both humans and agents. The Manage Work Board action writes exclusive owner claims and handoff status; a claim must succeed remotely before coding. Tests cover conflicting claims, dependency/review gates, action routing and setup read-only modes. Seventeen unit checks, six browser tests, TypeScript and static build passed. A fresh-Mac run and live GitHub claim are still awaiting acceptance; do not mark onboarding complete until verified.
+Collaboration setup added on 2026-10-31: [MAC-SETUP.md](MAC-SETUP.md) and the clickable launcher guide a collaborator through native Node 24, Git, VS Code, her own GitHub SSH key and Copilot sign-in. Installations are opt-in; no shared keys or global profile copying. The [shared roadmap](TODO.md) remains available, but its automated claim workflow is paused at the user's request; people and agents should check active owners and coordinate conversationally. Revisit automation later if simultaneous work makes it useful again. A fresh-Mac run remains unverified.
 
 Branch deployment implementation added on 2026-10-31: `develop` -> `dev.superheads.co.uk`, `main` -> `superheads.co.uk`, with build/test gates and separate environment readiness variables. See [DEPLOYMENT.md](DEPLOYMENT.md). GitHub secrets, environment protection and staging DNS/TLS provisioning remain external setup steps; earlier statements that no workflow exists are superseded. No remote deployment was performed during this setup.
 
@@ -78,5 +78,7 @@ Production prototype is live at `https://superheads.co.uk/` as of 2026-10-31. Th
 | 2026-10-30 | Retain static-first, identity-led restoration and read-only untrusted archive boundaries | User requirements; application version, asset selection and media migration remain pending |
 | 2026-10-31 | Implement screenshot-led console and equivalent mouse/keyboard input | 3 state tests, TypeScript, static build/export check and 6 Chromium browser tests passed |
 | 2026-10-31 | Check desktop/mobile rendering and motion | Screenshots at 1440/390/320px, original wordmark rendering, canvas pixel variation, animation, pause and reduced-motion checks passed; Safari and Firefox remain untested |
+| 2026-10-31 | Align local and CI runtime with Node 24 | Set baseline to 24.22.2; full Node 24 build/test validation pending |
+| 2026-10-31 | Pause automated work claims | Removed the GitHub claim action and mandatory claim instructions per user request; revisit later if needed |
 
 Add a dated entry for each relevant implementation or scope change; do not mark planned work as completed.

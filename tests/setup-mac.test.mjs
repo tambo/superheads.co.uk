@@ -43,7 +43,7 @@ test('help works outside the repo without changing the user home', () => {
     const result = runReadOnly(target, '--help');
     assert.equal(result.status, 0, result.stderr);
     assert.match(result.stdout, /--check: read-only prerequisites/);
-    assert.match(result.stdout, /22\.23\.4/);
+    assert.match(result.stdout, /24\.22\.2/);
   }
 });
 
@@ -89,7 +89,7 @@ test('keys, architecture and launcher preserve the safety contract', () => {
   assert.match(source, /major === pinMajor/);
   assert.match(launcherSource, /cd -- "\$\(dirname -- "\$0"\)"/);
   assert.match(launcherSource, /\/bin\/bash scripts\/setup-mac\.sh "\$@"/);
-  assert.equal(readFileSync(join(root, '.node-version'), 'utf8').trim(), '22.23.4');
+  assert.equal(readFileSync(join(root, '.node-version'), 'utf8').trim(), '24.22.2');
   const extensions = JSON.parse(readFileSync(join(root, '.vscode/extensions.json'), 'utf8'));
   assert.deepEqual(extensions.recommendations, ['GitHub.copilot-chat']);
 });

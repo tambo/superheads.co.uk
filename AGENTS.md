@@ -4,7 +4,7 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 
 ## Read First
 
-- Before choosing or editing work, read [COLLABORATION.md](docs/COLLABORATION.md) and fetch the latest `origin/develop` [work board](docs/TODO.md). Claims on remote develop are authoritative, not the local/main snapshot. Report task ID/status/owner, reserve it with Manage Work Board under the human's GitHub identity, wait for success and verify the remote owner before editing. In-progress, blocked and review tasks stay reserved. This applies to both owners and all agents; if unable to claim, ask the human instead of silently duplicating work. Keep handoff notes current and preserve newer remote board changes when merging.
+- Before substantial work, review [COLLABORATION.md](docs/COLLABORATION.md) and the latest `origin/develop` [work board](docs/TODO.md). Automated work claims are paused by user request; do not open claim workflows or block explicitly requested work on a claim. Check active ownership and coordinate with the human before overlapping work. Update the roadmap manually by agreement and preserve newer remote board changes when merging.
 - Use [the modernisation skill](.github/skills/superheads-modernisation/SKILL.md) for restoration, relaunch, archive inspection, asset selection, or implementation work.
 - Keep [the project guide](docs/PROJECT-GUIDE.md), [asset provenance](docs/ASSET-PROVENANCE.md), and [relaunch checklist](docs/RELAUNCH-CHECKLIST.md) current with relevant changes.
 - The first application is a focused restoration, not a complete migration of every legacy feature.
