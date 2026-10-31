@@ -4,6 +4,7 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 
 ## Read First
 
+- **Branch workflow:** `main` is production-only and is never the active coding worktree. Fetch `origin/develop`, then create a task branch/worktree from it for every change. Do not edit directly on `main` or `develop`. Submit completed work to `develop` by pull request; promote verified `develop` to `main` through a separate reviewed pull request only after staging checks and explicit release approval. If the opened worktree is `main`, stop editing and create a feature worktree from current `origin/develop` first. Leave unrelated dirty worktrees untouched.
 - Before substantial work, review [COLLABORATION.md](docs/COLLABORATION.md) and the latest `origin/develop` [work board](docs/TODO.md). Automated work claims are paused by user request; do not open claim workflows or block explicitly requested work on a claim. Check active ownership and coordinate with the human before overlapping work. Update the roadmap manually by agreement and preserve newer remote board changes when merging.
 - Use [the modernisation skill](.github/skills/superheads-modernisation/SKILL.md) for restoration, relaunch, archive inspection, asset selection, or implementation work.
 - Keep [the project guide](docs/PROJECT-GUIDE.md), [asset provenance](docs/ASSET-PROVENANCE.md), and [relaunch checklist](docs/RELAUNCH-CHECKLIST.md) current with relevant changes.
@@ -40,6 +41,7 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 
 ## Git And Deployment Boundaries
 
+- `main` is production-only: never use it as an active development worktree or edit it directly. Start each task from the latest `origin/develop` in a dedicated feature branch/worktree, then use a PR into `develop`. Promote tested staging changes from `develop` to `main` only through a separate reviewed PR after explicit release approval. Never commit directly to `main` or `develop`, force-push, or overwrite another worktree's changes.
 - Local Git initialisation is authorised. Do not create commits, remotes, remote repositories, or push without an explicit request.
 - Branch deployments are implemented in the workflow: `develop` targets `dev.superheads.co.uk`, `main` targets `superheads.co.uk`. Follow [deployment guidance](docs/DEPLOYMENT.md). Repository readiness variables gate initial activation; staging hosting, GitHub secrets and environment protection require configuration and verification. Never enable those gates or perform extra deployments without authorisation.
 - The hosting account is shared with Orphism, but targets must be Superheads-only. Refer to SSH environment variables `sshorphismuser`, `sshserver`, and `sshport`; never record their values or copy another site's deployment settings.
