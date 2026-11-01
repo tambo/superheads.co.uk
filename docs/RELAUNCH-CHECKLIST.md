@@ -21,7 +21,7 @@ Use this as a manually reviewed release gate, not evidence that a release has oc
 
 ## Application Verification
 
-- [ ] Authorise and deploy the Orphism audio-list CORS and audio-proxy allowlist updates for verified Superheads origins; verify live catalogue fetch, range streaming, Music-pad selection and actual audio playback. Local mocked-media tests do not complete this gate.
+- [x] Verify the user's Orphism allowlist update and live Superheads catalogue fetch, range streaming, Music-pad selection and actual MP3 play/pause on staging and production (2026-11-01). Localhost remains blocked; Safari/Firefox untested.
 - [ ] Record the selected current stable Next.js version; confirm TypeScript and App Router.
 - [ ] Verify `output: 'export'`, `trailingSlash: true`, and `images: { unoptimized: true }`; root deployment with no subdirectory prefix.
 - [ ] Confirm no API routes, Server Actions, SSR, request-time backend or runtime PHP/ASP/SWF is required.
@@ -51,6 +51,7 @@ Branch workflow and target-isolation checks are implemented; follow [DEPLOYMENT.
 
 | Date | Gate / scope | Exact check or evidence reference | Outcome | Remaining gaps |
 | --- | --- | --- | --- | --- |
+| 2026-11-01 | Authorised staging and production console/audio release | `npm test`; `npm run build`; `npm run test:e2e`; guarded deploy preview/apply for staging then production; HTTPS comparison and Chromium playback without mocks | Release commit `85b8363` pushed to develop, then main after staging verification; 24 unit/10 browser tests passed; verified backups made for both targets; protected hosting entries preserved; HTML matches build, 11 assets and 404 checks pass on both domains; Music pad 4 plays real `Minor Axis` MP3 and play/pause works | Localhost audio still denied by Orphism; Safari/Firefox untested; no assertion about Actions results or original-media migration |
 | 2026-11-01 | Section navigation | `npm run typecheck`; `npm test`; `npm run build`; `npm run test:e2e` | 20 unit tests and 7 Chromium tests passed; three square buttons span the column at 1440/390/320px; submenus switch 4/2/0; Info links absent | Local preview only; Community services and Jukebox playback unrestored; Safari/Firefox untested |
 | 2026-10-31 | Console spacing feature worktree | `node --test tests/console-state.test.mjs`; `npm run typecheck`; `npm run build`; `npm run test:e2e` | 3 focused state tests and 7 browser tests passed; 35 static output files exclude archive/runtime; screenshots inspected at 1440/390/320px | Local-only changes; exact reference fidelity and real Safari/Firefox remain unverified; no deployment |
 | 2026-10-31 | Console input | `npm test` | 3 focused state tests passed | Original media integration pending |
