@@ -4,7 +4,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { ArrowDownRight, Maximize, Minimize, Pause, Play, RotateCcw } from "lucide-react";
 import { contexts, sections, initialState, consoleReducer, keyboardAction, padKeys } from "../lib/console-state.mjs";
 import AudioPlayer, { type AudioTrack } from "./audio-player";
-import { artist, catalogueUrl, parseAudioCatalogue } from "../lib/audio-catalog.mjs";
+import { artist, audioOrigin, audioCatalogueUrl, parseAudioCatalogue } from "../lib/audio-catalog.mjs";
 
 const greetingMessage = "Greetings groovers ... welcome to the relaunch ... superheads still going after 25 years...";
 
@@ -86,9 +86,10 @@ export default function Collection() {
     const controller = new AbortController();
     setCatalogueLoading(true);
     setCatalogueError("");
-    fetch(catalogueUrl, { signal: controller.signal }).then(async response => {
+    const origin = audioOrigin(window.location.hostname);
+    fetch(audioCatalogueUrl(origin), { signal: controller.signal }).then(async response => {
       if (!response.ok || !response.headers.get("content-type")?.includes("application/json")) throw new Error("Catalogue unavailable");
-      const tracks = parseAudioCatalogue(await response.json());
+      const tracks = parseAudioCatalogue(await response.json(), origin);
       if (!tracks.length) throw new Error("No audio tracks");
       dispatch({ type: "catalogue", tracks });
     }).catch(() => {

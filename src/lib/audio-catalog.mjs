@@ -8,12 +8,21 @@ export const artist = {
 
 export const catalogueUrl = `${artist.origin}/audio/audio-list.php?folder=${artist.audioFolder}`;
 
-export function parseAudioCatalogue(data) {
+export function audioOrigin(hostname = "") {
+  return hostname === "localhost" ? "https://dev.orphism.co.uk" : artist.origin;
+}
+
+export function audioCatalogueUrl(origin = artist.origin) {
+  return `${origin}/audio/audio-list.php?folder=${artist.audioFolder}`;
+}
+
+export function parseAudioCatalogue(data, origin = artist.origin) {
+  if (![artist.origin, "https://dev.orphism.co.uk"].includes(origin)) throw new Error("Invalid audio origin");
   if (!data || data.folder !== artist.audioFolder || !Array.isArray(data.files)) throw new Error("Invalid artist catalogue");
   return data.files.filter(file => file.type === "audio").map(file => {
     if (typeof file.filename !== "string" || !/^[a-zA-Z0-9 _\-.&]+\.(mp3|wav|ogg|m4a)$/i.test(file.filename) || file.filename.includes("..")) throw new Error("Invalid audio filename");
-    const source = new URL(file.proxyUrl, artist.origin);
-    if (source.origin !== artist.origin || source.pathname !== "/audio/audio-proxy.php" || source.searchParams.get("file") !== `${artist.audioFolder}/${file.filename}`) throw new Error("Invalid streaming URL");
+    const source = new URL(file.proxyUrl, origin);
+    if (source.origin !== origin || source.pathname !== "/audio/audio-proxy.php" || source.searchParams.get("file") !== `${artist.audioFolder}/${file.filename}`) throw new Error("Invalid streaming URL");
     return { filename: file.filename, title: typeof file.title === "string" ? file.title.trim() : file.filename, source: source.href };
   }).slice(0, 17);
 }

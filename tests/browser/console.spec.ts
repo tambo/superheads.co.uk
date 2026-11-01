@@ -11,16 +11,18 @@ test.beforeEach(async ({ page }) => {
   audio.writeUInt32LE(8000, 24); audio.writeUInt32LE(16000, 28); audio.writeUInt16LE(2, 32); audio.writeUInt16LE(16, 34);
   audio.write("data", 36); audio.writeUInt32LE(audio.length - 44, 40);
   await page.route("https://orphism.co.uk/audio/audio-proxy.php?*", route => {
+    const corsHeaders = { "Access-Control-Allow-Origin": route.request().headers().origin || "http://127.0.0.1:3100" };
     const range = route.request().headers().range?.match(/^bytes=(\d+)-(\d*)$/);
-    if (!range) return route.fulfill({ contentType: "audio/wav", headers: { "Accept-Ranges": "bytes" }, body: audio });
+    if (!range) return route.fulfill({ contentType: "audio/wav", headers: { ...corsHeaders, "Accept-Ranges": "bytes" }, body: audio });
     const start = Number(range[1]);
     const end = range[2] ? Math.min(Number(range[2]), audio.length - 1) : audio.length - 1;
-    return route.fulfill({ status: 206, contentType: "audio/wav", headers: { "Accept-Ranges": "bytes", "Content-Range": `bytes ${start}-${end}/${audio.length}` }, body: audio.subarray(start, end + 1) });
+    return route.fulfill({ status: 206, contentType: "audio/wav", headers: { ...corsHeaders, "Accept-Ranges": "bytes", "Content-Range": `bytes ${start}-${end}/${audio.length}` }, body: audio.subarray(start, end + 1) });
   });
 });
 
 test("Music pads drive the PHP audio player and transport controls", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator("audio")).toHaveAttribute("crossorigin", "anonymous");
   await page.getByRole("button", { name: "MUSIC", exact: true }).click();
   await expect(page.locator(".pad-9")).toBeEnabled();
   await expect(page.locator(".pad-10")).toBeDisabled();
