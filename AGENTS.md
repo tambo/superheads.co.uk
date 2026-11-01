@@ -4,6 +4,7 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 
 ## Read First
 
+- Workspace access: inspect and read project files, including user-provided archives, directly without asking permission. Treat archived/legacy files as read-only data: never execute or serve them. Ask only before actions needing a user decision, external authorization, or a consequential change such as deployment.
 - Before substantial work, review [COLLABORATION.md](docs/COLLABORATION.md) and the latest `origin/develop` [work board](docs/TODO.md). Automated work claims are paused by user request; do not open claim workflows or block explicitly requested work on a claim. Check active ownership and coordinate with the human before overlapping work. Update the roadmap manually by agreement and preserve newer remote board changes when merging.
 - Use [the modernisation skill](.github/skills/superheads-modernisation/SKILL.md) for restoration, relaunch, archive inspection, asset selection, or implementation work.
 - Keep [the project guide](docs/PROJECT-GUIDE.md), [asset provenance](docs/ASSET-PROVENANCE.md), and [relaunch checklist](docs/RELAUNCH-CHECKLIST.md) current with relevant changes.
@@ -15,8 +16,9 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 - Use the user-supplied `archive/screenshots/Screenshot 2026-10-30 at 23.50.02.png` as the primary layout reference and the recording in that folder as transition evidence. Do not infer complete layouts from isolated exports. Screenshots are private reference material, not public assets.
 - **Visual fidelity is a requirement, not a suggestion.** Before changing visible UI, inspect the exact supplied screenshot/reference and original home export at the relevant state and viewport. Preserve original artwork, typography, font face, glyph shapes, kerning, proportions, alignment, spacing, colors and composition. Use the exact reviewed asset whenever one exists; do not redraw a logo or replace an image with text/CSS, a substitute font, approximation or generic component styling. Add visual regression checks against the reference where practical. If exact reproduction is not possible with available, approved assets or evidence, do not implement a visual approximation: explain the specific limitation, offer clear options and ask the user which trade-off they approve before changing the design.
 - Preserve the widescreen display, bottom keyboard-shaped content bank and right-hand layered context navigation. Mouse clicks and keyboard controls must dispatch the same selection behavior; context changes reset the bank. Record and test shortcut mappings, native keyboard focus and reduced motion.
-- Preserve navigation labels and order: Music, Videos, Games, AV Lab, Portfolio, Info. Adapt layout responsively without replacing the identity with a generic template.
+- The top-right navigation has three square buttons spanning the column: AV LAB, Community, Jukebox. AV LAB has Music, Videos, Games, Lab submenus; Community has SoftFood Cafe and Twat Modern; Jukebox has no submenu. Do not show About Us, Contact or Info buttons. Keep historical Portfolio material out of these controls unless the user changes scope.
 - Distinguish historical material from present availability. Never fabricate active services, clients, events, playable media, or working legacy integrations.
+- Music-player integration uses Orphism's Tomaz Sounder metadata and existing PHP catalogue/proxy from the browser. No PHP is deployed to Superheads. Staging/production origins passed catalogue CORS and range-access checks after the user's Orphism update; localhost remains blocked. Preserve explicit unavailable states and do not claim fixture-based tests prove production audio playback.
 - The current first prototype is the screenshot-led media console with newly authored AV Lab visual studies. These are not reconstructed original animations. Browser-local favourites, shape filtering, detailed Portfolio case studies and original media migration remain pending until explicitly completed and verified.
 
 ## Archive And Security
@@ -40,8 +42,19 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 
 ## Git And Deployment Boundaries
 
+- Implement changes in a feature branch/worktree based on the latest `origin/develop`; `main` is production-only. Do not edit `main` or `develop` directly. Review changes into `develop`, verify staging, then promote separately to `main`.
 - Local Git initialisation is authorised. Do not create commits, remotes, remote repositories, or push without an explicit request.
 - Branch deployments are implemented in the workflow: `develop` targets `dev.superheads.co.uk`, `main` targets `superheads.co.uk`. Follow [deployment guidance](docs/DEPLOYMENT.md). Repository readiness variables gate initial activation; staging hosting, GitHub secrets and environment protection require configuration and verification. Never enable those gates or perform extra deployments without authorisation.
 - The hosting account is shared with Orphism, but targets must be Superheads-only. Refer to SSH environment variables `sshorphismuser`, `sshserver`, and `sshport`; never record their values or copy another site's deployment settings.
 - Only the generated static `out/` contents may be deployed to the separately verified Superheads target. Preserve `.well-known/`; exclude the archive, source, secrets, and legacy server files.
 - Maintain application, documentation and deployment checks together when their contracts change.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

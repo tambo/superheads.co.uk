@@ -14,13 +14,14 @@ Use this as a manually reviewed release gate, not evidence that a release has oc
 ## Identity And Content
 
 - [ ] Compare the restoration against `archive/legacy-site/_export/home`: black/charcoal interface, home graphics, historical text and visual hierarchy retained.
-- [ ] Preserve navigation order and labels: Music, Videos, Games, AV Lab, Portfolio, Info.
+- [ ] Verify three square top-right sections: AV LAB, Community, Jukebox. Check AV LAB submenus Music/Videos/Games/Lab, Community submenus SoftFood Cafe/Twat Modern, no Jukebox submenu, and no About Us/Contact/Info buttons.
 - [ ] Review historical context; no fabricated active services, clients, events, integrations or availability claims.
 - [ ] Confirm Portfolio case studies are explicitly historical and grounded in archived evidence.
 - [ ] Keep media migration pending unless separately completed and tested; do not imply unavailable playback or games are functional.
 
 ## Application Verification
 
+- [ ] Authorise and deploy the Orphism audio-list CORS and audio-proxy allowlist updates for verified Superheads origins; verify live catalogue fetch, range streaming, Music-pad selection and actual audio playback. Local mocked-media tests do not complete this gate.
 - [ ] Record the selected current stable Next.js version; confirm TypeScript and App Router.
 - [ ] Verify `output: 'export'`, `trailingSlash: true`, and `images: { unoptimized: true }`; root deployment with no subdirectory prefix.
 - [ ] Confirm no API routes, Server Actions, SSR, request-time backend or runtime PHP/ASP/SWF is required.
@@ -50,6 +51,8 @@ Branch workflow and target-isolation checks are implemented; follow [DEPLOYMENT.
 
 | Date | Gate / scope | Exact check or evidence reference | Outcome | Remaining gaps |
 | --- | --- | --- | --- | --- |
+| 2026-11-01 | Section navigation | `npm run typecheck`; `npm test`; `npm run build`; `npm run test:e2e` | 20 unit tests and 7 Chromium tests passed; three square buttons span the column at 1440/390/320px; submenus switch 4/2/0; Info links absent | Local preview only; Community services and Jukebox playback unrestored; Safari/Firefox untested |
+| 2026-10-31 | Console spacing feature worktree | `node --test tests/console-state.test.mjs`; `npm run typecheck`; `npm run build`; `npm run test:e2e` | 3 focused state tests and 7 browser tests passed; 35 static output files exclude archive/runtime; screenshots inspected at 1440/390/320px | Local-only changes; exact reference fidelity and real Safari/Firefox remain unverified; no deployment |
 | 2026-10-31 | Console input | `npm test` | 3 focused state tests passed | Original media integration pending |
 | 2026-10-31 | Types and static output | `npm run typecheck`; `npm run build` | Passed; homepage plus 34 export files, no archive or legacy runtime in output | No remote release verification |
 | 2026-10-31 | Browser console and responsive layout | `npm run test:e2e` | 6 Chromium tests passed: input, context reset, motion/pause, 1440/390/320px, assets, reduced motion and native Space behavior | Safari/Firefox, full legacy media, favourites and gallery filters untested/unimplemented |

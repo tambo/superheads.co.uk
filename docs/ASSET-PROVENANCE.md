@@ -28,6 +28,10 @@ Numeric artwork destinations must retain the source basename. Use the actual has
 
 ## Historical Content And Media
 
+Audio-player reference added on 2026-11-01: the private screenshot `archive/screenshots/Screenshot 2026-10-31 at 23.19.05.png` informs player composition and charcoal/orange styling only; it is not published. The player uses the existing reviewed `4.svg` wordmark and newly authored HTML/CSS with Lucide transport icons. No player artwork or audio was copied from the archive. Modern metadata is sourced from Orphism's `_artists/tomaz-sounder.md` and its public `audio-list.php?folder=tomaz-sounder` response (ten audio entries observed). Audio remains hosted and streamed through Orphism's existing PHP proxy. Browser playback tests use generated media, not copies of the artist's recordings. Live cross-origin permission remains blocked and requires an authorised server update; no rights clearance or deployment is implied by this integration.
+
+Map-arrow verification on 2026-11-01: `public/artwork/home/191.svg` is byte-for-byte identical to `archive/legacy-site/_export/home/shapes/191.svg` (`cmp` passed). SHA256 is `2e44802c955983ee739c57b715f437858d9bc8827e518cfdbb89c75785b60199`, matching the existing manifest. The 69-by-69 vector retains its hollow block-arrow path, `fill="none"` and `stroke="#5b5b5b"`; no recolouring or redraw was applied. The map box renders this existing curated asset using screenshot-relative size and inset. Publication rights status remains unchanged.
+
 Track the source of historical text and case studies alongside artwork. Preserve wording and historical context; distinguish editorial clarification from original copy. Do not invent active clients, services, events, availability or working playback.
 
 | Source path / section | Restored page / section | Editorial changes and rationale | Historical context / rights review | Status |

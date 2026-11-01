@@ -28,6 +28,24 @@ The archive is untrusted: a suspicious obfuscated PHP entry point was discovered
 | Music / Videos / Games | Preserve identity and accurate historical context | Media migration remains pending; verify availability before enabling experiences |
 | Info | Preserve historical text with clear temporal context | No fabricated active services, events or contact promises |
 
+## Console Controls
+
+### Tomaz Sounder Audio
+
+The screenshot `archive/screenshots/Screenshot 2026-10-31 at 23.19.05.png` guides the compact charcoal/orange player next to the map. This is newly implemented HTML/CSS and native audio, not an embedded Flash player or an exact reconstruction of its artwork. It has previous/next, play/pause, stop, seeking, volume and elapsed/duration controls. Historical LO/HI bandwidth controls are not fabricated because the catalogue does not provide alternative bitrate sources.
+
+Artist metadata comes from Orphism's `_artists/tomaz-sounder.md`: title `Tomaz Sounder`, excerpt `House, Techno, Drum & Bass`, audio folder `tomaz-sounder`. Superheads reads `https://orphism.co.uk/audio/audio-list.php?folder=tomaz-sounder` in the browser and uses that response's existing `/audio/audio-proxy.php` URLs, resolved on Orphism. Only audio entries are mapped in catalogue order to the 17 Music pads. Pointer and keyboard selection start the same track; player transport updates the pad selection while Music is open. Leaving Music preserves playback; returning restores its selected pad. No new PHP, API route, audio-file copy or authentication token is introduced in Superheads.
+
+Live access rechecked on 2026-11-01 after the user deployed Orphism updates: `https://superheads.co.uk` and `https://dev.superheads.co.uk` receive exact-origin catalogue CORS permission and 206 byte-range stream responses. Localhost still receives no catalogue CORS permission and 403 streams, so the local player retains its unavailable/retry state. Do not add wildcard CORS, forge headers, weaken filename/range validation or deploy PHP to Superheads. No Orphism files or remote configuration were changed by this agent.
+
+Validation: 24 unit tests, TypeScript and static build passed. Browser tests exercise actual native media playback using generated WAV byte-range responses and mocked copies of the ten verified Tomaz Sounder catalogue entries, plus catalogue failure/retry and 1440/390/320px layouts. Production/staging catalogue and range access now pass read-only HTTP checks; real browser MP3 playback is checked separately during release. Safari/Firefox remain unverified.
+
+The map-box heading is a looping ticker with the default message `Greetings groovers ... welcome to the relaunch ... superheads still going after 25 years...`. The original hollow arrow uses the unchanged reviewed `191.svg`, with its original grey stroke and no fill; its size and inset follow the screenshot proportions. The header spans the inner width while reserving text clearance beside the arrow. There is no manual pause button. Reduced motion automatically stops scrolling and displays the message statically with wrapping; the map uses the remaining space below. Static build (including TypeScript) and eight Chromium browser tests passed on 2026-11-01, including exact arrow source/dimensions, ticker separation and live reduced-motion changes. The map box remains hidden on the existing small-screen layout.
+
+Top-level section labels are uppercase in heavy Helvetica Neue (weight 900), with Helvetica/sans-serif fallbacks. The exported `fonts/50_Akzidenz Grotesk BE Super.ttf` appears closer to the original heavy lettering, but webfont redistribution clearance is not recorded; it has not been copied or embedded. The system-font choice is not a claim of exact typeface reproduction. Static build and seven Chromium browser tests passed for this typography update on 2026-11-01.
+
+The bottom content bank has 17 square pads in a staggered 10+7 desktop arrangement. Each face shows only its index and assigned keyboard key; accessible labels identify content and empty slots are disabled. Three square top-right buttons span the column: AV LAB, Community, Jukebox. AV LAB shows Music, Videos, Games and Lab; Community shows SoftFood Cafe and Twat Modern; Jukebox has no submenu. About Us, Contact and Info buttons are removed. Mobile reflows the keys and navigation without horizontal overflow. Community services and Jukebox playback remain unrestored.
+
 ## Technical Contract
 
 - Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: Node.js >=24.22.2 <25 on macOS, Linux and Windows, with native ARM64 or x64. `.node-version`, npm lifecycle checks and CI enforce the Node version; CI uses standard x64 Ubuntu.
@@ -49,10 +67,10 @@ The app and gitignore are now implemented. Local Git has no commits or remotes. 
 
 | Input | Action |
 | --- | --- |
-| Q / W / E / A / S / D | Select one of the six context-sensitive pads |
-| 1 / 2 / 3 / 4 / 5 / 6 | Music / Videos / Games / AV Lab / Portfolio / Info |
+| Q / W / E / R / T / Y / U / I / O / P / A / S / D / F / G / H / J | Select the corresponding numbered pad; empty slots remain disabled |
+| 1 / 2 / 3 / 4 | Music / Videos / Games / AV Lab |
 | Space | Pause/resume an AV Lab study; focused native buttons retain Space activation |
-| R | Restart the visual study |
+| Backspace | Restart the visual study |
 | Escape | Return to AV Lab |
 | Pointer | Click the same controls; move over a study to change its composition |
 
@@ -63,6 +81,10 @@ Empty pads are disabled. Held key repetition, text-entry fields and modifier sho
 Use [RELAUNCH-CHECKLIST.md](RELAUNCH-CHECKLIST.md) as the release gate. Record actual test commands and results, asset provenance, known gaps and scope changes as implementation progresses. Test static route output, root assets, mobile/desktop fidelity, keyboard navigation, favourites storage behavior and gallery filters. A historical hash baseline does not replace verification of the separate backup or new derived assets.
 
 ## Decision And Change Record
+
+Navigation update on 2026-11-01: implemented the three square sections and section-specific submenus, removed Info links, and verified selection reset and 4/2/0 submenu counts. Typecheck, 20 unit tests, static export and seven Chromium browser tests passed; square dimensions and full-column fit checked at 1440/390/320px. No deployment or legacy-service restoration.
+
+Console spacing update on 2026-10-31, in `feat/console-spacing` based on `origin/develop`: four collection controls beneath AV LAB, three individually selectable lower Info links and 17 numbered/key-only pads. Focused state tests, TypeScript, static export and seven Chromium tests passed, including screenshots at 1440/390/320px. This is a local preview, not a deployment or a claim of pixel-identical reconstruction. Workspace inspection does not require permission; archives remain read-only data. Future coding uses develop-based feature worktrees, with main reserved for production.
 
 Collaboration setup added on 2026-10-31: [MAC-SETUP.md](MAC-SETUP.md) and the clickable launcher guide a collaborator through native Node 24, Git, VS Code, her own GitHub SSH key and Copilot sign-in. Installations are opt-in; no shared keys or global profile copying. The [shared roadmap](TODO.md) remains available, but its automated claim workflow is paused at the user's request; people and agents should check active owners and coordinate conversationally. Revisit automation later if simultaneous work makes it useful again. A fresh-Mac run remains unverified.
 

@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useReducer, useRef, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, Maximize, Minimize, Pause, Play, RotateCcw } from "lucide-react";
-import { contexts, initialState, consoleReducer, keyboardAction, padKeys } from "../lib/console-state.mjs";
+import { ArrowDownRight, Maximize, Minimize, Pause, Play, RotateCcw } from "lucide-react";
+import { contexts, sections, initialState, consoleReducer, keyboardAction, padKeys } from "../lib/console-state.mjs";
+import AudioPlayer, { type AudioTrack } from "./audio-player";
+import { artist, catalogueUrl, parseAudioCatalogue } from "../lib/audio-catalog.mjs";
+
+const greetingMessage = "Greetings groovers ... welcome to the relaunch ... superheads still going after 25 years...";
 
 function Visual({ slot, paused, revision }: { slot: number; paused: boolean; revision: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -68,9 +72,30 @@ function Visual({ slot, paused, revision }: { slot: number; paused: boolean; rev
 export default function Collection() {
   const [state, dispatch] = useReducer(consoleReducer, initialState);
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
+  const [catalogueLoading, setCatalogueLoading] = useState(true);
+  const [catalogueError, setCatalogueError] = useState("");
+  const [catalogueAttempt, setCatalogueAttempt] = useState(0);
   const displayRef = useRef<HTMLDivElement>(null);
   const context = contexts.find(item => item.id === state.context)!;
-  const selected = context.items[state.slot];
+  const items = state.context === "music" ? state.musicTracks.map((track: AudioTrack) => track.title) : context.items;
+  const selected = items[state.slot] || (state.context === "music" ? "Tomaz Sounder" : context.label);
+  const section = sections.find(item => item.context === state.context || item.submenu.includes(state.context))!;
+  const renderPad = (slot: number) => <button key={slot} className={`pad pad-${slot}`} disabled={!items[slot]} aria-pressed={Boolean(items[slot]) && state.slot === slot} aria-keyshortcuts={padKeys[slot].toUpperCase()} aria-label={items[slot] ? `${slot + 1}, ${padKeys[slot].toUpperCase()}: ${items[slot]}` : `${slot + 1}, ${padKeys[slot].toUpperCase()}: empty`} title={`${slot + 1} / ${padKeys[slot].toUpperCase()}${items[slot] ? `: ${items[slot]}` : ""}`} onClick={() => dispatch({ type: "slot", slot })}><small>{slot + 1}</small><span>{padKeys[slot].toUpperCase()}</span></button>;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setCatalogueLoading(true);
+    setCatalogueError("");
+    fetch(catalogueUrl, { signal: controller.signal }).then(async response => {
+      if (!response.ok || !response.headers.get("content-type")?.includes("application/json")) throw new Error("Catalogue unavailable");
+      const tracks = parseAudioCatalogue(await response.json());
+      if (!tracks.length) throw new Error("No audio tracks");
+      dispatch({ type: "catalogue", tracks });
+    }).catch(() => {
+      if (!controller.signal.aborted) setCatalogueError("Track catalogue unavailable. Streaming access needs to allow this site.");
+    }).finally(() => { if (!controller.signal.aborted) setCatalogueLoading(false); });
+    return () => controller.abort();
+  }, [catalogueAttempt]);
 
   useEffect(() => {
     if (!pseudoFullscreen) return;
@@ -114,11 +139,21 @@ export default function Collection() {
   return <main className="console">
     <a className="skip" href="#control-bank">Skip to content controls</a>
     <header className="identity">
+      <div className="identity-copy">
       <h1><img src="/artwork/home/4.svg" alt="superheads" width="145" height="27" /></h1>
       <p>departing non-stop to all digital destinations</p>
+      </div>
+      <AudioPlayer tracks={state.musicTracks} index={state.audioIndex} revision={state.audioRevision} loading={catalogueLoading} error={catalogueError} onSelect={slot => dispatch({ type: "audio-track", slot })} onRetry={() => setCatalogueAttempt(value => value + 1)} />
     </header>
     <aside className="destination" aria-label="Gig-a-bites">
-      <strong>GIG-A-BITES</strong><ArrowUpRight aria-hidden="true" />
+      <img className="map-arrow" src="/artwork/home/191.svg" width="69" height="69" alt="" aria-hidden="true" />
+      <div className="ticker-header">
+        <div className="greeting-ticker" role="marquee" aria-label={greetingMessage}>
+          <div className="ticker-track" aria-hidden="true">
+            <span>{greetingMessage}</span><span>{greetingMessage}</span>
+          </div>
+        </div>
+      </div>
       <img src="/artwork/home/18.svg" width="299" height="143" alt="Original Superheads world map" />
       <span className="map-marker" />
     </aside>
@@ -128,33 +163,37 @@ export default function Collection() {
         {state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
           <span className="eyebrow">{context.label}</span>
           <h2>{selected}</h2>
-          <p>{state.context === "tools" ? "The original tools included favourites, an address book and chat. These services have not been restored." : state.context === "tv" ? "Superheads TV was an original channel concept. No stream is available in this restoration." : state.context === "info" ? selected === "Contact" ? "Original contact: info@superheads.co.uk. Current availability is unverified." : "An interface restoration of the original Superheads digital playground. Legacy media migration remains pending." : state.context === "portfolio" ? "A historical project listed in the original homepage. Detailed case-study restoration is pending." : "Original collection entry. Legacy playback is not yet restored."}</p>
+          <p>{state.context === "music" ? artist.excerpt : section.id === "community" ? "The original community service has not been restored." : "Original collection entry. Legacy playback is not yet restored."}</p>
         </div>}
       </div>
       <div className="transport">
         <span aria-live="polite">{selected}{state.context === "lab" && <small> / visual study</small>}</span>
         <div>
           <button aria-label={state.paused ? "Play visual" : "Pause visual"} title="Play / pause (Space)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "pause" })}>{state.paused ? <Play /> : <Pause />}</button>
-          <button aria-label="Restart visual" title="Restart (R)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>
+          <button aria-label="Restart visual" aria-keyshortcuts="Backspace" title="Restart (Backspace)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>
           <button aria-label="Fullscreen display" title="Fullscreen display" onClick={enterFullscreen}><Maximize /></button>
         </div>
       </div>
-          </section>
+    </section>
     <aside className="navigation">
-      <div className="context-tiles">
-        {[{ id: "lab", label: "AV Lab" }, { id: "tools", label: "Tools" }, { id: "tv", label: "TV" }].map(item => <button key={item.id} aria-pressed={state.context === item.id} onClick={() => changeContext(item.id)}><ArrowUpRight aria-hidden="true" /><span>{item.label.toUpperCase()}</span></button>)}
-      </div>
+      <nav className="section-tiles" aria-label="Main sections">
+        {sections.map(item => <button key={item.id} aria-pressed={section.id === item.id} onClick={() => dispatch({ type: "section", section: item.id })}>{item.label.toUpperCase()}</button>)}
+      </nav>
       <p className="context-description">{context.description}</p>
-      <nav aria-label="Content contexts">
-        {contexts.slice(0, 6).map((item, index) => <button key={item.id} aria-pressed={state.context === item.id} aria-keyshortcuts={String(index + 1)} title={`${item.label} (${index + 1})`} onClick={() => changeContext(item.id)}><ArrowDownRight aria-hidden="true" /><span>{item.label.toUpperCase()}</span></button>)}
+      <nav className="context-tiles" aria-label="Content contexts">
+        {section.submenu.map(identifier => {
+          const item = contexts.find(context => context.id === identifier)!;
+          return <button key={item.id} aria-pressed={state.context === item.id} onClick={() => changeContext(item.id)}><ArrowDownRight aria-hidden="true" /><span>{item.id === "lab" ? "LAB" : item.label.toUpperCase()}</span></button>;
+        })}
       </nav>
     </aside>
     <section className="control-section" id="control-bank" aria-label="Content controls">
       <div className="bank-heading"><h2>{context.label.toUpperCase()}</h2><span>{selected.toUpperCase()}</span></div>
-      <div className="pad-bank">
-        {Array.from({ length: 6 }, (_, slot) => <button key={slot} className={`pad pad-${slot}`} disabled={!context.items[slot]} aria-pressed={state.slot === slot} aria-keyshortcuts={padKeys[slot].toUpperCase()} title={context.items[slot] ? `${context.items[slot]} (${padKeys[slot].toUpperCase()})` : "Empty pad"} onClick={() => dispatch({ type: "slot", slot })}><kbd>{padKeys[slot].toUpperCase()}</kbd><span>{context.items[slot] || ""}</span></button>)}
+      <div className="pad-bank" aria-label="Keyboard content pads">
+        <div className="pad-row pad-row-top">{Array.from({ length: 10 }, (_, slot) => renderPad(slot))}</div>
+        <div className="pad-row pad-row-bottom">{Array.from({ length: 7 }, (_, index) => renderPad(index + 10))}</div>
       </div>
-      <p className="album">from the album:<br /><em>a senseless act of beauty</em></p>
+      <p className="album">{state.context === "music" ? "artist:" : "from the album:"}<br /><em>{state.context === "music" ? artist.title : "a senseless act of beauty"}</em></p>
     </section>
   </main>;
 }
