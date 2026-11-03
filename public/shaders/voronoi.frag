@@ -1,3 +1,4 @@
+// iAudio = (bass, mid, treble, overall), each 0..1
 vec2 hash2(vec2 p) {
   p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
   return fract(sin(p) * 43758.5453);
@@ -11,13 +12,13 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     for (int x = -1; x <= 1; x++) {
       vec2 g = vec2(float(x), float(y));
       vec2 h = hash2(i + g);
-      vec2 o = 0.5 + 0.5 * sin(iTime * 0.8 + 6.2831 * h);
+      vec2 o = 0.5 + 0.5 * sin(iTime * 0.8 + iAudio.y * 2.0 + 6.2831 * h);
       float d = length(g + o - f);
       if (d < d1) { d2 = d1; d1 = d; id = h.x; } else if (d < d2) { d2 = d; }
     }
   }
   vec3 col = 0.5 + 0.5 * cos(vec3(0.0, 2.0, 4.0) + id * 6.28 + iTime * 0.2);
-  col *= 0.35 + 0.65 * smoothstep(0.0, 0.6, d1);
-  col += smoothstep(0.08, 0.0, d2 - d1) * 0.5;
+  col *= (0.35 + 0.65 * smoothstep(0.0, 0.6, d1)) * (1.0 + iAudio.x * 0.6);
+  col += smoothstep(0.08, 0.0, d2 - d1) * (0.5 + iAudio.z * 0.8);
   fragColor = vec4(col, 1.0);
 }
