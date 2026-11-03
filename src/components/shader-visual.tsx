@@ -62,6 +62,20 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
     const time = gl.getUniformLocation(program, "iTime");
     const mouse = gl.getUniformLocation(program, "iMouse");
     const audio = gl.getUniformLocation(program, "iAudio");
+    // Render at the displayed size so fullscreen fills the screen sharply, within a pixel budget.
+    const fit = () => {
+      const bounds = canvas.getBoundingClientRect();
+      const scale = Math.min(window.devicePixelRatio || 1, 2);
+      let width = Math.max(2, Math.round(bounds.width * scale));
+      let height = Math.max(2, Math.round(bounds.height * scale));
+      const shrink = Math.min(1, Math.sqrt(1600000 / (width * height)));
+      width = Math.round(width * shrink);
+      height = Math.round(height * shrink);
+      if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+    };
+    fit();
+    const resizer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(fit);
+    resizer?.observe(canvas);
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     const key = `${shader.file || shader.source}:${revision}`;
     if (timeline.current.key !== key) timeline.current = { key, elapsed: 0 };
@@ -82,6 +96,7 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
     frame = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(frame);
+      resizer?.disconnect();
       gl.deleteProgram(program);
       gl.deleteBuffer(buffer);
     };
