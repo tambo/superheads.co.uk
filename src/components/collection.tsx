@@ -120,6 +120,12 @@ export default function Collection() {
   }, [wantsAudio, state.slot, state.musicTracks.length]);
 
   useEffect(() => {
+    const release = () => { if (!document.fullscreenElement) screen.orientation?.unlock?.(); };
+    document.addEventListener("fullscreenchange", release);
+    return () => document.removeEventListener("fullscreenchange", release);
+  }, []);
+
+  useEffect(() => {
     if (!pseudoFullscreen) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -129,9 +135,10 @@ export default function Collection() {
   const enterFullscreen = async () => {
     const element = displayRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
     try {
-      if (element?.requestFullscreen) await element.requestFullscreen();
+      if (element?.requestFullscreen) await element.requestFullscreen({ navigationUI: "hide" });
       else if (element?.webkitRequestFullscreen) element.webkitRequestFullscreen();
-      else setPseudoFullscreen(true);
+      else { setPseudoFullscreen(true); return; }
+      (screen.orientation as ScreenOrientation & { lock?: (orientation: string) => Promise<void> } | undefined)?.lock?.("landscape").catch(() => {});
     } catch { setPseudoFullscreen(true); }
   };
 

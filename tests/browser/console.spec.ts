@@ -236,3 +236,19 @@ test("fullscreen falls back to a CSS mode where the Fullscreen API is missing (i
   await page.getByRole("button", { name: "Exit fullscreen" }).click();
   await expect(display).not.toHaveClass(/pseudo-fullscreen/);
 });
+
+test("shader canvas fills a landscape phone screen in fullscreen", async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.addInitScript(() => {
+    Object.defineProperty(Element.prototype, "requestFullscreen", { value: undefined, configurable: true });
+    Object.defineProperty(Element.prototype, "webkitRequestFullscreen", { value: undefined, configurable: true });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Fullscreen display" }).click();
+  const canvas = page.locator(".display canvas");
+  await expect.poll(async () => {
+    const box = await canvas.boundingBox();
+    const buffer = await canvas.evaluate(element => ({ width: (element as HTMLCanvasElement).width, height: (element as HTMLCanvasElement).height }));
+    return { box, ratio: Math.abs(buffer.width / buffer.height - 844 / 390) < 0.02 };
+  }).toMatchObject({ box: { x: 0, y: 0, width: 844, height: 390 }, ratio: true });
+});
