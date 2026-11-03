@@ -22,7 +22,7 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
     setError("");
     if (shader.source) { setSource(shader.source); return; }
     const controller = new AbortController();
-    fetch(shader.file!, { signal: controller.signal }).then(async response => {
+    fetch(shader.file!, { signal: controller.signal, cache: "no-cache" }).then(async response => {
       if (!response.ok) throw new Error("missing");
       setSource(await response.text());
     }).catch(() => { if (!controller.signal.aborted) setError("Shader file unavailable."); });

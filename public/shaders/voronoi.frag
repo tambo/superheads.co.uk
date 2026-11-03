@@ -18,7 +18,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     }
   }
   vec3 col = 0.5 + 0.5 * cos(vec3(0.0, 2.0, 4.0) + id * 6.28 + iTime * 0.2);
-  col *= (0.35 + 0.65 * smoothstep(0.0, 0.6, d1)) * (1.0 + iAudio.x * 0.6);
+  col *= (0.35 + 0.65 * smoothstep(0.0, 0.6, d1)) * (1.0 + iAudio.x * 1.0);
   col += smoothstep(0.08, 0.0, d2 - d1) * (0.5 + iAudio.z * 0.8);
   fragColor = vec4(col, 1.0);
 }
