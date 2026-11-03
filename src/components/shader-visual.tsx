@@ -31,7 +31,7 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !source) return;
-    const gl = canvas.getContext("webgl");
+    const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
     if (!gl) { setError("WebGL is not available in this browser."); return; }
     const compile = (type: number, code: string) => {
       const object = gl.createShader(type)!;

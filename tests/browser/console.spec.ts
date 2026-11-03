@@ -191,7 +191,12 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
       expect(navButton!.height).toBeLessThanOrEqual(30);
     }
     const variation = await page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
-      const pixels = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data;
+      const copy = document.createElement("canvas");
+      copy.width = canvas.width;
+      copy.height = canvas.height;
+      const copyContext = copy.getContext("2d")!;
+      copyContext.drawImage(canvas, 0, 0);
+      const pixels = copyContext.getImageData(0, 0, canvas.width, canvas.height).data;
       return new Set(Array.from(pixels).filter((_, index) => index % 4 === 0)).size;
     });
     expect(variation).toBeGreaterThan(20);
