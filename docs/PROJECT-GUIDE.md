@@ -50,7 +50,7 @@ The bottom content bank has 17 square pads in a staggered 10+7 desktop arrangeme
 
 ## Technical Contract
 
-- Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: Node.js >=20.9.0 (any newer version accepted; CI uses 24.22.2) on macOS, Linux and Windows, with native ARM64 or x64. `.node-version`, npm lifecycle checks and CI enforce the Node version; CI uses standard x64 Ubuntu.
+- Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: Node.js >=20.9.0 (any newer version accepted; CI uses the current Node LTS; 24.22.2 is only the setup-helper default) on macOS, Linux and Windows, with native ARM64 or x64. `.node-version`, npm lifecycle checks and CI enforce the Node version; CI uses standard x64 Ubuntu.
 - Static build: `output: 'export'`, `trailingSlash: true`, `images: { unoptimized: true }`.
 - Deployment: domain root, static `out/` contents only; no subdirectory base path.
 - No API routes, Server Actions, SSR, request-time backend or runtime PHP/ASP/SWF. Build-time rendering and browser-local interactions are allowed.
