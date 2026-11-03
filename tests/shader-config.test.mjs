@@ -46,3 +46,12 @@ test("playAudio flag is parsed and audio levels are derived from frequency bins"
   const simulated = simulatedLevels(0.1);
   assert.ok(Object.values(simulated).every(value => value >= 0 && value <= 1));
 });
+
+test("every shipped shader reacts to audio and starts the player", () => {
+  const shaders = parseShaderConfig(JSON.parse(readFileSync("public/config/shaders.json", "utf8")));
+  for (const shader of shaders) {
+    assert.equal(shader.playAudio, true, shader.title);
+    const source = readFileSync(`public${shader.file}`, "utf8");
+    assert.ok((source.match(/iAudio\.[xyzw]/g) || []).length >= 3, `${shader.title} uses iAudio`);
+  }
+});
