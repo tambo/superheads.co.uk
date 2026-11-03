@@ -77,7 +77,7 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
       }} /></label>
     </div>
     {(error || playbackError) && <div className="audio-error" role="status"><span>{playbackError || error}</span>{error && <button onClick={onRetry}>Retry</button>}</div>}
-    <audio ref={audioRef} src={track?.source} preload="none" onLoadedMetadata={event => {
+    <audio ref={audioRef} crossOrigin="anonymous" src={track?.source} preload="none" onLoadedMetadata={event => {
       setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0);
       event.currentTarget.volume = volume;
     }} onTimeUpdate={event => setElapsed(event.currentTarget.currentTime)} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={() => setPlaybackError("Streaming unavailable for this site.")} onEnded={() => {

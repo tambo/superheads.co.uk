@@ -10,9 +10,10 @@ test("runtime policy accepts Node 24 on native ARM64 and x64 hosts", () => {
   assert.equal(runtimeProblem({ version: "24.22.2", arch: "x64", platform: "win32" }), null);
 });
 
-test("runtime policy rejects old patches, other majors, unsupported architectures and platforms", () => {
-  assert.match(runtimeProblem({ version: "24.22.1", arch: "arm64", platform: "darwin" }), /requires Node/);
-  assert.match(runtimeProblem({ version: "25.0.0", arch: "arm64", platform: "darwin" }), /requires Node/);
+test("runtime policy rejects old versions, unsupported architectures and platforms", () => {
+  assert.match(runtimeProblem({ version: "20.8.9", arch: "arm64", platform: "darwin" }), /requires Node/);
+  assert.equal(runtimeProblem({ version: "25.0.0", arch: "arm64", platform: "darwin" }), null);
+  assert.equal(runtimeProblem({ version: "26.12.1", arch: "x64", platform: "linux" }), null);
   assert.match(runtimeProblem({ version: "24.22.2", arch: "ia32", platform: "win32" }), /requires native ARM64 or x64/);
   assert.match(runtimeProblem({ version: "24.22.2", arch: "arm64", platform: "freebsd" }), /requires macOS, Linux, or Windows/);
 });

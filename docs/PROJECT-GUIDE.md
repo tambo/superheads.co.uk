@@ -32,6 +32,8 @@ The archive is untrusted: a suspicious obfuscated PHP entry point was discovered
 
 ### Tomaz Sounder Audio
 
+Local playback fix (2026-11-01): when opened at `http://localhost:3000`, both catalogue and stream URLs use `https://dev.orphism.co.uk`. Other hosts retain the production audio origin. Native audio uses anonymous CORS so the browser sends its actual Origin; staging rejects Referer-only localhost media requests. Real localhost `Minor Axis` MP3 playback and pause passed in Chromium without mocks. Use localhost rather than 127.0.0.1, which is not permitted by the existing Orphism staging configuration. No remote permissions or deployment were changed for this fix.
+
 The screenshot `archive/screenshots/Screenshot 2026-10-31 at 23.19.05.png` guides the compact charcoal/orange player next to the map. This is newly implemented HTML/CSS and native audio, not an embedded Flash player or an exact reconstruction of its artwork. It has previous/next, play/pause, stop, seeking, volume and elapsed/duration controls. Historical LO/HI bandwidth controls are not fabricated because the catalogue does not provide alternative bitrate sources.
 
 Artist metadata comes from Orphism's `_artists/tomaz-sounder.md`: title `Tomaz Sounder`, excerpt `House, Techno, Drum & Bass`, audio folder `tomaz-sounder`. Superheads reads `https://orphism.co.uk/audio/audio-list.php?folder=tomaz-sounder` in the browser and uses that response's existing `/audio/audio-proxy.php` URLs, resolved on Orphism. Only audio entries are mapped in catalogue order to the 17 Music pads. Pointer and keyboard selection start the same track; player transport updates the pad selection while Music is open. Leaving Music preserves playback; returning restores its selected pad. No new PHP, API route, audio-file copy or authentication token is introduced in Superheads.
@@ -48,7 +50,7 @@ The bottom content bank has 17 square pads in a staggered 10+7 desktop arrangeme
 
 ## Technical Contract
 
-- Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: Node.js >=24.22.2 <25 on macOS, Linux and Windows, with native ARM64 or x64. `.node-version`, npm lifecycle checks and CI enforce the Node version; CI uses standard x64 Ubuntu.
+- Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: Node.js >=20.9.0 (any newer version accepted; CI uses the current Node LTS; 24.22.2 is only the setup-helper default) on macOS, Linux and Windows, with native ARM64 or x64. `.node-version`, npm lifecycle checks and CI enforce the Node version; CI uses standard x64 Ubuntu.
 - Static build: `output: 'export'`, `trailingSlash: true`, `images: { unoptimized: true }`.
 - Deployment: domain root, static `out/` contents only; no subdirectory base path.
 - No API routes, Server Actions, SSR, request-time backend or runtime PHP/ASP/SWF. Build-time rendering and browser-local interactions are allowed.
@@ -108,3 +110,7 @@ Production prototype is live at `https://superheads.co.uk/` as of 2026-10-31. Th
 | 2026-10-31 | Enforce Node 24.22.2 across supported platforms | `fnm` project pin, engine range, strict npm preflight/lifecycle checks, native-architecture Mac helper, standard Ubuntu CI; runtime regression tests added |
 
 Add a dated entry for each relevant implementation or scope change; do not mark planned work as completed.
+
+## AV Lab Shader Player
+
+The AV Lab display renders WebGL fragment shaders listed in `public/config/shaders.json` (max 17, one per pad). Each entry has `title`, either `file` (a `/shaders/*.frag` path) or inline `source`, and optional `speed`. Shaders use Shadertoy-style `mainImage` with `iResolution`, `iTime` and `iMouse`. The config is fetched at runtime, so edits on the server need no rebuild. If it is missing or invalid, the original canvas studies remain as the fallback. Play/pause, restart, reduced motion and fullscreen behave as for the studies. Bundled shaders are newly authored.
