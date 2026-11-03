@@ -32,7 +32,7 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 
 ## Implementation Contract
 
-- Runtime: Node.js `>=24.22.2 <25` on macOS, Linux and Windows with supported ARM64 or x64 binaries. Prefer the host-native architecture (ARM64 on Apple Silicon, x64 on Intel Macs and standard GitHub Ubuntu runners). Enforce the version through `.node-version`, `engines.node`, `.npmrc` and the npm runtime preflight. Never require Apple Silicon or ARM-only CI. DreamHost serves the exported static files and does not need Node installed.
+- Runtime: Node.js `>=20.9.0` (Next.js minimum; any newer Node is accepted, CI uses 24.22.2) on macOS, Linux and Windows with supported ARM64 or x64 binaries. Prefer the host-native architecture (ARM64 on Apple Silicon, x64 on Intel Macs and standard GitHub Ubuntu runners). Enforce the version through `.node-version`, `engines.node`, `.npmrc` and the npm runtime preflight. Never require Apple Silicon or ARM-only CI. DreamHost serves the exported static files and does not need Node installed.
 
 - Use the current stable Next.js release at implementation time, TypeScript, and App Router. Record the chosen version in the project guide.
 - Configure static export with `output: 'export'`, `trailingSlash: true`, and `images: { unoptimized: true }`. Deploy at the domain root, without a subdirectory base path.

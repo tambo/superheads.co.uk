@@ -15,11 +15,14 @@ export const sections = [
   { id: "jukebox", label: "Jukebox", context: "jukebox", submenu: [] },
 ];
 export const padKeys = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f", "g", "h", "j"];
-export const initialState = { context: "lab", slot: 0, paused: false, revision: 0, musicTracks: [], audioIndex: 0, audioRevision: 0 };
+export const initialState = { context: "lab", slot: 0, paused: false, revision: 0, musicTracks: [], audioIndex: 0, audioRevision: 0, labCount: null };
 
 export function consoleReducer(state, action) {
   if (action.type === "catalogue" && Array.isArray(action.tracks)) {
     return { ...state, musicTracks: action.tracks.slice(0, 17), slot: state.context === "music" ? 0 : state.slot, audioIndex: 0 };
+  }
+  if (action.type === "lab-items" && Number.isInteger(action.count) && action.count >= 0) {
+    return { ...state, labCount: action.count, slot: state.context === "lab" ? 0 : state.slot };
   }
   if (action.type === "audio-track" && Number.isInteger(action.slot) && action.slot >= 0 && action.slot < state.musicTracks.length) {
     return { ...state, audioIndex: action.slot, audioRevision: state.audioRevision + 1, slot: state.context === "music" ? action.slot : state.slot };
@@ -32,7 +35,7 @@ export function consoleReducer(state, action) {
     return { ...state, context: action.context, slot: action.context === "music" ? state.audioIndex : 0, paused: false };
   }
   const context = contexts.find(context => context.id === state.context);
-  const itemCount = state.context === "music" ? state.musicTracks.length : context.items.length;
+  const itemCount = state.context === "music" ? state.musicTracks.length : state.context === "lab" && state.labCount !== null ? state.labCount : context.items.length;
   if (action.type === "slot" && Number.isInteger(action.slot) && action.slot >= 0 && action.slot < itemCount) {
     return state.context === "music" ? { ...state, slot: action.slot, audioIndex: action.slot, audioRevision: state.audioRevision + 1 } : { ...state, slot: action.slot, paused: false };
   }

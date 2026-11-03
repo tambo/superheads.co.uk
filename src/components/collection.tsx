@@ -4,6 +4,8 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { ArrowDownRight, Maximize, Minimize, Pause, Play, RotateCcw } from "lucide-react";
 import { contexts, sections, initialState, consoleReducer, keyboardAction, padKeys } from "../lib/console-state.mjs";
 import AudioPlayer, { type AudioTrack } from "./audio-player";
+import ShaderVisual, { type ShaderEntry } from "./shader-visual";
+import { shaderConfigUrl, parseShaderConfig } from "../lib/shader-config.mjs";
 import { artist, audioOrigin, audioCatalogueUrl, parseAudioCatalogue } from "../lib/audio-catalog.mjs";
 
 const greetingMessage = "Greetings groovers ... welcome to the relaunch ... superheads still going after 25 years...";
@@ -75,9 +77,10 @@ export default function Collection() {
   const [catalogueLoading, setCatalogueLoading] = useState(true);
   const [catalogueError, setCatalogueError] = useState("");
   const [catalogueAttempt, setCatalogueAttempt] = useState(0);
+  const [shaders, setShaders] = useState<ShaderEntry[]>([]);
   const displayRef = useRef<HTMLDivElement>(null);
   const context = contexts.find(item => item.id === state.context)!;
-  const items = state.context === "music" ? state.musicTracks.map((track: AudioTrack) => track.title) : context.items;
+  const items = state.context === "music" ? state.musicTracks.map((track: AudioTrack) => track.title) : state.context === "lab" && shaders.length ? shaders.map(shader => shader.title) : context.items;
   const selected = items[state.slot] || (state.context === "music" ? "Tomaz Sounder" : context.label);
   const section = sections.find(item => item.context === state.context || item.submenu.includes(state.context))!;
   const renderPad = (slot: number) => <button key={slot} className={`pad pad-${slot}`} disabled={!items[slot]} aria-pressed={Boolean(items[slot]) && state.slot === slot} aria-keyshortcuts={padKeys[slot].toUpperCase()} aria-label={items[slot] ? `${slot + 1}, ${padKeys[slot].toUpperCase()}: ${items[slot]}` : `${slot + 1}, ${padKeys[slot].toUpperCase()}: empty`} title={`${slot + 1} / ${padKeys[slot].toUpperCase()}${items[slot] ? `: ${items[slot]}` : ""}`} onClick={() => dispatch({ type: "slot", slot })}><small>{slot + 1}</small><span>{padKeys[slot].toUpperCase()}</span></button>;
@@ -97,6 +100,18 @@ export default function Collection() {
     }).finally(() => { if (!controller.signal.aborted) setCatalogueLoading(false); });
     return () => controller.abort();
   }, [catalogueAttempt]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(shaderConfigUrl, { signal: controller.signal, cache: "no-cache" }).then(async response => {
+      if (!response.ok) throw new Error("Shader config unavailable");
+      const parsed: ShaderEntry[] = parseShaderConfig(await response.json());
+      if (!parsed.length) throw new Error("No shaders");
+      setShaders(parsed);
+      dispatch({ type: "lab-items", count: parsed.length });
+    }).catch(() => {});
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     if (!pseudoFullscreen) return;
@@ -161,14 +176,14 @@ export default function Collection() {
     <section className="screen-section" aria-label="Main display">
       <div className={pseudoFullscreen ? "display pseudo-fullscreen" : "display"} ref={displayRef}>
         {pseudoFullscreen && <button className="exit-fullscreen" aria-label="Exit fullscreen" title="Exit fullscreen (Escape)" onClick={() => setPseudoFullscreen(false)}><Minimize /></button>}
-        {state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
+        {state.context === "lab" && shaders.length ? <ShaderVisual shader={shaders[state.slot] || shaders[0]} paused={state.paused} revision={state.revision} /> : state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
           <span className="eyebrow">{context.label}</span>
           <h2>{selected}</h2>
           <p>{state.context === "music" ? artist.excerpt : section.id === "community" ? "The original community service has not been restored." : "Original collection entry. Legacy playback is not yet restored."}</p>
         </div>}
       </div>
       <div className="transport">
-        <span aria-live="polite">{selected}{state.context === "lab" && <small> / visual study</small>}</span>
+        <span aria-live="polite">{selected}{state.context === "lab" && <small>{shaders.length ? " / shader" : " / visual study"}</small>}</span>
         <div>
           <button aria-label={state.paused ? "Play visual" : "Pause visual"} title="Play / pause (Space)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "pause" })}>{state.paused ? <Play /> : <Pause />}</button>
           <button aria-label="Restart visual" aria-keyshortcuts="Backspace" title="Restart (Backspace)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>

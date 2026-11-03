@@ -21,7 +21,7 @@ Workspace files are available for direct inspection without permission prompts. 
 
 **Exact visual fidelity is mandatory.** Inspect the supplied screenshot and original artwork at the target state and viewport before changing visible UI. Reuse reviewed original artwork and typography exactly, including custom letterforms, kerning, scale, alignment, color and composition. Never substitute CSS text, a system/web font or a redraw for an existing wordmark/logo. Where the source asset is unavailable or cannot exactly reproduce the requested appearance, stop before a visual approximation; state the specific gap, present options and ask the user to choose. Add screenshot/reference comparisons to tests where practical.
 
-Runtime policy: use Node.js `>=24.22.2 <25` on supported macOS, Linux and Windows environments. Prefer the host-native architecture: ARM64 on Apple Silicon and x64 on Intel Macs and standard GitHub Ubuntu runners. Do not require an Apple Silicon workstation or ARM-only CI. DreamHost receives static `out/` files and does not run Node.
+Runtime policy: use Node.js `>=20.9.0` (any newer Node is accepted; CI uses 24.22.2) on supported macOS, Linux and Windows environments. Prefer the host-native architecture: ARM64 on Apple Silicon and x64 on Intel Macs and standard GitHub Ubuntu runners. Do not require an Apple Silicon workstation or ARM-only CI. DreamHost receives static `out/` files and does not run Node.
 
 Branch policy: implement in a feature branch/worktree based on the latest `origin/develop`. `main` is production-only; do not edit `main` or `develop` directly. Review into develop and verify staging before a separate production promotion.
 

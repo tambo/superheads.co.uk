@@ -50,7 +50,7 @@ The bottom content bank has 17 square pads in a staggered 10+7 desktop arrangeme
 
 ## Technical Contract
 
-- Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: Node.js >=24.22.2 <25 on macOS, Linux and Windows, with native ARM64 or x64. `.node-version`, npm lifecycle checks and CI enforce the Node version; CI uses standard x64 Ubuntu.
+- Framework: Next.js 16.4.3, React 19.3.1, TypeScript and App Router; versions selected from the registry during setup. Runtime: Node.js >=20.9.0 (any newer version accepted; CI uses 24.22.2) on macOS, Linux and Windows, with native ARM64 or x64. `.node-version`, npm lifecycle checks and CI enforce the Node version; CI uses standard x64 Ubuntu.
 - Static build: `output: 'export'`, `trailingSlash: true`, `images: { unoptimized: true }`.
 - Deployment: domain root, static `out/` contents only; no subdirectory base path.
 - No API routes, Server Actions, SSR, request-time backend or runtime PHP/ASP/SWF. Build-time rendering and browser-local interactions are allowed.
@@ -110,3 +110,7 @@ Production prototype is live at `https://superheads.co.uk/` as of 2026-10-31. Th
 | 2026-10-31 | Enforce Node 24.22.2 across supported platforms | `fnm` project pin, engine range, strict npm preflight/lifecycle checks, native-architecture Mac helper, standard Ubuntu CI; runtime regression tests added |
 
 Add a dated entry for each relevant implementation or scope change; do not mark planned work as completed.
+
+## AV Lab Shader Player
+
+The AV Lab display renders WebGL fragment shaders listed in `public/config/shaders.json` (max 17, one per pad). Each entry has `title`, either `file` (a `/shaders/*.frag` path) or inline `source`, and optional `speed`. Shaders use Shadertoy-style `mainImage` with `iResolution`, `iTime` and `iMouse`. The config is fetched at runtime, so edits on the server need no rebuild. If it is missing or invalid, the original canvas studies remain as the fallback. Play/pause, restart, reduced motion and fullscreen behave as for the studies. Bundled shaders are newly authored.

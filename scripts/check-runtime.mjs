@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 
-const minimum = [24, 22, 2];
+const minimum = [20, 9, 0];
 
 function getNativeMacArch() {
   try {
@@ -19,8 +19,9 @@ export function runtimeProblem(options = {}) {
   if (arch !== "arm64" && arch !== "x64") return `Superheads requires native ARM64 or x64 Node; current architecture is ${arch}.`;
   if (!["darwin", "linux", "win32"].includes(platform)) return `Superheads requires macOS, Linux, or Windows; current platform is ${platform}.`;
   if (platform === "darwin" && nativeMacArch && arch !== nativeMacArch) return `Use native ${nativeMacArch} Node on this Mac instead of ${arch} under translation.`;
-  if (major !== 24 || minor < minimum[1] || (minor === minimum[1] && patch < minimum[2])) {
-    return `Superheads requires Node 24.22.2 or newer within Node 24; current version is ${version}.`;
+  const tooOld = !(major > minimum[0] || (major === minimum[0] && (minor > minimum[1] || (minor === minimum[1] && patch >= minimum[2]))));
+  if ([major, minor, patch].some(Number.isNaN) || tooOld) {
+    return `Superheads requires Node ${minimum.join(".")} or newer; current version is ${version}.`;
   }
   return null;
 }
