@@ -32,3 +32,17 @@ test("lab item count drives slot selection", () => {
   assert.equal(consoleReducer(state, { type: "slot", slot: 2 }).slot, 2);
   assert.equal(consoleReducer(state, { type: "slot", slot: 3 }).slot, 0);
 });
+
+test("playAudio flag is parsed and audio levels are derived from frequency bins", async () => {
+  const { bandLevels, smoothLevels, simulatedLevels } = await import("../src/lib/audio-levels.mjs");
+  const [on, off] = parseShaderConfig({ shaders: [{ source: "mainImage", playAudio: true }, { source: "mainImage", playAudio: "yes" }] });
+  assert.equal(on.playAudio, true);
+  assert.equal(off.playAudio, false);
+  const loudBass = bandLevels(Uint8Array.from({ length: 128 }, (_, index) => (index < 4 ? 255 : 0)));
+  assert.ok(loudBass.bass > 0.9 && loudBass.treble === 0);
+  assert.deepEqual(bandLevels(new Uint8Array(128)), { bass: 0, mid: 0, treble: 0, level: 0 });
+  const rising = smoothLevels({ bass: 0, mid: 0, treble: 0, level: 0 }, { bass: 1, mid: 0, treble: 0, level: 0 });
+  assert.ok(rising.bass > 0 && rising.bass < 1);
+  const simulated = simulatedLevels(0.1);
+  assert.ok(Object.values(simulated).every(value => value >= 0 && value <= 1));
+});

@@ -1,5 +1,5 @@
 {
-  "_help": "AV Lab shader playlist. Each entry fills one pad (max 17, in order). Use 'file' (a path under /shaders/, GLSL fragment source) or inline 'source'. Shaders use Shadertoy-style mainImage(out vec4 fragColor, in vec2 fragCoord) with uniforms iResolution (vec3), iTime (float) and iMouse (vec4, pixels). 'speed' is an optional time multiplier (default 1). Edit this file on the server; no rebuild needed.",
+  "_help": "AV Lab shader playlist. Each entry fills one pad (max 17, in order). Use 'file' (a path under /shaders/, GLSL fragment source) or inline 'source'. Shaders use Shadertoy-style mainImage(out vec4 fragColor, in vec2 fragCoord) with uniforms iResolution (vec3), iTime (float) and iMouse (vec4, pixels) and iAudio (vec4: bass, mid, treble, overall level, each 0-1, from the Jukebox player). Set playAudio to true to start the audio player when that shader is selected. 'speed' is an optional time multiplier (default 1). Edit this file on the server; no rebuild needed.",
   "shaders": [
     {
       "title": "Plasma",
@@ -12,9 +12,10 @@
       "speed": 0.8
     },
     {
-      "title": "Rings",
-      "file": "/shaders/rings.frag",
-      "speed": 1.2
+      "title": "Pulse Plasma",
+      "file": "/shaders/pulse.frag",
+      "speed": 1,
+      "playAudio": true
     },
     {
       "title": "Lava",

@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { buildFragmentSource } from "../lib/shader-config.mjs";
+import { audioLevels, simulatedLevels } from "../lib/audio-levels.mjs";
 
-export interface ShaderEntry { title: string; speed: number; file?: string; source?: string }
+export interface ShaderEntry { title: string; speed: number; playAudio?: boolean; file?: string; source?: string }
 
 const vertex = "attribute vec2 p; void main() { gl_Position = vec4(p, 0.0, 1.0); }";
 
@@ -60,6 +61,7 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
     const resolution = gl.getUniformLocation(program, "iResolution");
     const time = gl.getUniformLocation(program, "iTime");
     const mouse = gl.getUniformLocation(program, "iMouse");
+    const audio = gl.getUniformLocation(program, "iAudio");
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     const key = `${shader.file || shader.source}:${revision}`;
     if (timeline.current.key !== key) timeline.current = { key, elapsed: 0 };
@@ -72,6 +74,8 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
       gl.uniform3f(resolution, canvas.width, canvas.height, 1);
       gl.uniform1f(time, timeline.current.elapsed);
       gl.uniform4f(mouse, pointer.current.x * canvas.width, (1 - pointer.current.y) * canvas.height, 0, 0);
+      const levels = audioLevels.live ? audioLevels : audioLevels.playing ? simulatedLevels(timestamp / 1000) : null;
+      gl.uniform4f(audio, levels?.bass ?? 0, levels?.mid ?? 0, levels?.treble ?? 0, levels?.level ?? 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       frame = requestAnimationFrame(draw);
     };
