@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowDownRight, Pause, Play, SkipBack, SkipForward, Square, Volume2 } from "lucide-react";
 import { artist, formatAudioTime } from "../lib/audio-catalog.mjs";
+import { audioLevels, bandLevels, smoothLevels } from "../lib/audio-levels.mjs";
 
 export interface AudioTrack { filename: string; title: string; source: string }
 
@@ -16,7 +17,58 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
   const [playbackError, setPlaybackError] = useState("");
+  const [corsMode, setCorsMode] = useState<"anonymous" | undefined>("anonymous");
+  const analyser = useRef<AnalyserNode | null>(null);
   const track = tracks[index];
+
+  // Analysis needs a CORS-enabled stream. If the host rejects CORS the element is retried without it and the visuals use a simulated pulse.
+  useEffect(() => {
+    const audio = audioRef.current;
+    analyser.current = null;
+    audioLevels.live = false;
+    if (!audio || corsMode !== "anonymous") return;
+    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    let context: AudioContext | undefined;
+    const connect = () => {
+      if (context) { context.resume().catch(() => {}); return; }
+      try {
+        context = new AudioContextClass();
+        const node = context.createAnalyser();
+        node.fftSize = 256;
+        node.smoothingTimeConstant = 0.6;
+        context.createMediaElementSource(audio).connect(node);
+        node.connect(context.destination);
+        analyser.current = node;
+      } catch { context = undefined; }
+    };
+    audio.addEventListener("play", connect);
+    return () => {
+      audio.removeEventListener("play", connect);
+      analyser.current = null;
+      audioLevels.live = false;
+      context?.close().catch(() => {});
+    };
+  }, [corsMode]);
+
+  useEffect(() => {
+    audioLevels.playing = playing;
+    if (!playing) { audioLevels.live = false; audioLevels.bass = audioLevels.mid = audioLevels.treble = audioLevels.level = 0; return; }
+    const bins = new Uint8Array(128);
+    let frame = 0;
+    let levels = { bass: 0, mid: 0, treble: 0, level: 0 };
+    const sample = () => {
+      const node = analyser.current;
+      if (node) {
+        node.getByteFrequencyData(bins);
+        levels = smoothLevels(levels, bandLevels(bins));
+        Object.assign(audioLevels, levels, { live: true });
+      }
+      frame = requestAnimationFrame(sample);
+    };
+    frame = requestAnimationFrame(sample);
+    return () => { cancelAnimationFrame(frame); audioLevels.live = false; };
+  }, [playing]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -30,7 +82,7 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
       if (!cancelled && error.name !== "AbortError") setPlaybackError("Playback unavailable. Press play to retry.");
     });
     return () => { cancelled = true; };
-  }, [track?.source, revision]);
+  }, [track?.source, revision, corsMode]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -77,10 +129,13 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
       }} /></label>
     </div>
     {(error || playbackError) && <div className="audio-error" role="status"><span>{playbackError || error}</span>{error && <button onClick={onRetry}>Retry</button>}</div>}
-    <audio ref={audioRef} crossOrigin="anonymous" src={track?.source} preload="none" onLoadedMetadata={event => {
+    <audio key={corsMode || "plain"} ref={audioRef} crossOrigin={corsMode} src={track?.source} preload="none" onLoadedMetadata={event => {
       setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0);
       event.currentTarget.volume = volume;
-    }} onTimeUpdate={event => setElapsed(event.currentTarget.currentTime)} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={() => setPlaybackError("Streaming unavailable for this site.")} onEnded={() => {
+    }} onTimeUpdate={event => setElapsed(event.currentTarget.currentTime)} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={() => {
+      if (corsMode) setCorsMode(undefined);
+      else setPlaybackError("Streaming unavailable for this site.");
+    }} onEnded={() => {
       if (index < tracks.length - 1) onSelect(index + 1);
       else { setPlaying(false); setElapsed(0); }
     }} />

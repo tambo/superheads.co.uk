@@ -5,6 +5,7 @@ import { ArrowDownRight, Maximize, Minimize, Pause, Play, RotateCcw } from "luci
 import { contexts, sections, initialState, consoleReducer, keyboardAction, padKeys } from "../lib/console-state.mjs";
 import AudioPlayer, { type AudioTrack } from "./audio-player";
 import ShaderVisual, { type ShaderEntry } from "./shader-visual";
+import { audioLevels } from "../lib/audio-levels.mjs";
 import { shaderConfigUrl, parseShaderConfig } from "../lib/shader-config.mjs";
 import { artist, audioOrigin, audioCatalogueUrl, parseAudioCatalogue } from "../lib/audio-catalog.mjs";
 
@@ -112,6 +113,11 @@ export default function Collection() {
     }).catch(() => {});
     return () => controller.abort();
   }, []);
+
+  const wantsAudio = state.context === "lab" && Boolean(shaders[state.slot]?.playAudio);
+  useEffect(() => {
+    if (wantsAudio && state.musicTracks.length && !audioLevels.playing) dispatch({ type: "audio-track", slot: state.audioIndex });
+  }, [wantsAudio, state.slot, state.musicTracks.length]);
 
   useEffect(() => {
     if (!pseudoFullscreen) return;
