@@ -80,6 +80,7 @@ export default function Collection() {
   const [catalogueAttempt, setCatalogueAttempt] = useState(0);
   const [shaders, setShaders] = useState<ShaderEntry[]>([]);
   const displayRef = useRef<HTMLDivElement>(null);
+  const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
   const context = contexts.find(item => item.id === state.context)!;
   const items = state.context === "music" ? state.musicTracks.map((track: AudioTrack) => track.title) : state.context === "lab" && shaders.length ? shaders.map(shader => shader.title) : context.items;
   const selected = items[state.slot] || (state.context === "music" ? "Tomaz Sounder" : context.label);
@@ -140,7 +141,11 @@ export default function Collection() {
   }, [pseudoFullscreen]);
 
   const enterFullscreen = async () => {
+    if (pseudoFullscreen) { setPseudoFullscreen(false); return; }
+    if (document.fullscreenElement) { await document.exitFullscreen(); return; }
     const element = displayRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
+    const fullscreenDocument = document as Document & { webkitFullscreenElement?: Element; webkitExitFullscreen?: () => void };
+    if (fullscreenDocument.webkitFullscreenElement) { fullscreenDocument.webkitExitFullscreen?.(); return; }
     try {
       if (element?.requestFullscreen) await element.requestFullscreen({ navigationUI: "hide" });
       else if (element?.webkitRequestFullscreen) element.webkitRequestFullscreen();
@@ -161,12 +166,14 @@ export default function Collection() {
       if (event.key === " " && target?.closest("button, a")) return;
       const action = keyboardAction(event.key);
       if (!action || (action.type === "pause" && state.context !== "lab")) return;
+      if (action.type === "auto-visuals" && (state.context !== "lab" || shaders.length < 2)) return;
       event.preventDefault();
-      dispatch(action);
+      if (action.type === "fullscreen") fullscreenButtonRef.current?.click();
+      else dispatch(action);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state.context, pseudoFullscreen]);
+  }, [state.context, pseudoFullscreen, shaders.length]);
 
   const changeContext = (identifier: string) => {
     dispatch({ type: "context", context: identifier });
@@ -196,7 +203,7 @@ export default function Collection() {
     <section className="screen-section" aria-label="Main display">
       <div className={pseudoFullscreen ? "display pseudo-fullscreen" : "display"} ref={displayRef}>
         {pseudoFullscreen && <button className="exit-fullscreen" aria-label="Exit fullscreen" title="Exit fullscreen (Escape)" onClick={() => setPseudoFullscreen(false)}><Minimize /></button>}
-        {state.context === "lab" && shaders.length ? <ShaderVisual shader={shaders[state.slot] || shaders[0]} paused={state.paused} revision={state.revision} /> : state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
+        {state.context === "lab" && shaders.length ? <ShaderVisual shader={shaders[state.slot] || shaders[0]} paused={state.paused} revision={state.revision} crossfade={state.automaticVisual} /> : state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
           <span className="eyebrow">{context.label}</span>
           <h2>{selected}</h2>
           <p>{state.context === "music" ? artist.excerpt : section.id === "community" ? "The original community service has not been restored." : "Original collection entry. Legacy playback is not yet restored."}</p>
@@ -207,8 +214,8 @@ export default function Collection() {
         <div>
           <button aria-label={state.paused ? "Play visual" : "Pause visual"} title="Play / pause (Space)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "pause" })}>{state.paused ? <Play /> : <Pause />}</button>
           <button aria-label="Restart visual" aria-keyshortcuts="Backspace" title="Restart (Backspace)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>
-          <button aria-label="Fullscreen display" title="Fullscreen display" onClick={enterFullscreen}><Maximize /></button>
-          <button aria-label="Auto-play visuals" aria-pressed={state.autoVisuals} title="Auto-play visuals: random change every 5-10 seconds" disabled={state.context !== "lab" || shaders.length < 2} onClick={() => dispatch({ type: "auto-visuals" })}><Shuffle /></button>
+          <button ref={fullscreenButtonRef} aria-label="Fullscreen display" aria-keyshortcuts="[" title="Toggle fullscreen ([)" onClick={enterFullscreen}><Maximize /></button>
+          <button aria-label="Auto-play visuals" aria-keyshortcuts="]" aria-pressed={state.autoVisuals} title="Auto-play visuals (]): random change every 5-10 seconds" disabled={state.context !== "lab" || shaders.length < 2} onClick={() => dispatch({ type: "auto-visuals" })}><Shuffle /></button>
         </div>
       </div>
     </section>
@@ -226,9 +233,10 @@ export default function Collection() {
     </aside>
     <section className="control-section" id="control-bank" aria-label="Content controls">
       <div className="bank-heading"><h2>{context.label.toUpperCase()}</h2><span>{selected.toUpperCase()}</span></div>
-      <div className="pad-bank" aria-label="Keyboard content pads">
+      <div className={state.context === "lab" ? "pad-bank lab-keyboard" : "pad-bank"} aria-label="Keyboard content pads">
         <div className="pad-row pad-row-top">{Array.from({ length: 10 }, (_, slot) => renderPad(slot))}</div>
-        <div className="pad-row pad-row-bottom">{Array.from({ length: 7 }, (_, index) => renderPad(index + 10))}</div>
+        <div className="pad-row pad-row-bottom">{Array.from({ length: state.context === "lab" ? 9 : 7 }, (_, index) => renderPad(index + 10))}</div>
+        {state.context === "lab" && <div className="pad-row pad-row-third">{Array.from({ length: 7 }, (_, index) => renderPad(index + 19))}</div>}
       </div>
       <p className="album">{state.context === "music" ? "artist:" : "from the album:"}<br /><em>{state.context === "music" ? artist.title : "a senseless act of beauty"}</em></p>
     </section>

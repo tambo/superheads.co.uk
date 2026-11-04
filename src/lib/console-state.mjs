@@ -14,7 +14,7 @@ export const sections = [
   { id: "community", label: "Community", context: "cafe", submenu: ["cafe", "modern"] },
   { id: "jukebox", label: "Jukebox", context: "jukebox", submenu: [] },
 ];
-export const padKeys = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f", "g", "h", "j"];
+export const padKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
 export const initialState = { context: "lab", slot: 0, paused: false, revision: 0, musicTracks: [], audioIndex: 0, audioRevision: 0, labCount: null, autoVisuals: false, manualVisualRevision: 0, automaticVisual: false };
 
 export function randomVisualStep(current, count, random = Math.random) {
@@ -51,6 +51,8 @@ export function consoleReducer(state, action) {
 }
 
 export function keyboardAction(key) {
+  if (key === "[") return { type: "fullscreen" };
+  if (key === "]") return { type: "auto-visuals" };
   const lower = key.toLowerCase();
   const slot = padKeys.indexOf(lower);
   if (slot >= 0) return { type: "slot", slot };

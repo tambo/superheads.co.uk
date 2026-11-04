@@ -1,3 +1,10 @@
+.pad-bank.lab-keyboard { width: min(100%, 760px); margin-left: auto; margin-right: auto; gap: 7px; }
+.lab-keyboard .pad-row { display: grid; gap: 7px; margin-left: 0; }
+.lab-keyboard .pad-row-top { width: 100%; grid-template-columns: repeat(10, minmax(0, 1fr)); }
+.lab-keyboard .pad-row-bottom { width: calc(90% - 0.7px); margin-left: 2.5%; grid-template-columns: repeat(9, minmax(0, 1fr)); }
+.lab-keyboard .pad-row-third { width: calc(70% - 2.1px); margin-left: 7.5%; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.lab-keyboard .pad-row-bottom .pad:first-child { grid-column: auto; }
+@media (max-width: 640px) { .pad-bank.lab-keyboard { width: 100%; gap: 4px; }.lab-keyboard .pad-row { gap: 4px; }.lab-keyboard .pad { padding: 8px 1px 1px; font-size: 13px; }.lab-keyboard .pad small { top: 2px; left: 2px; font-size: 7px; }.lab-keyboard .pad-row-bottom { width: calc(90% - 0.4px); }.lab-keyboard .pad-row-third { width: calc(70% - 1.2px); } }
 :root { color-scheme: dark; --yellow: #ffda00; --orange: #ff9700; --line: #424242; --grey: #999; }
 * { box-sizing: border-box; }
 body { margin: 0; background: #000; color: #eee; font-family: "Helvetica Neue", Helvetica, sans-serif; }
@@ -51,6 +58,9 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .display:fullscreen canvas, .display.pseudo-fullscreen canvas { width: 100%; height: 100%; object-fit: contain; }
 .exit-fullscreen { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 1; width: 44px; height: 44px; display: grid; place-items: center; }
 .display canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.shader-stage { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.shader-outgoing { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.shader-outgoing[hidden] { display: none; }
 .shader-error { position: absolute; left: 12px; bottom: 10px; margin: 0; padding: 4px 8px; background: #000c; color: #ffcc00; font-size: 12px; }
 .display-copy { padding: 7%; height: 100%; display: flex; flex-direction: column; justify-content: center; }
 .eyebrow { color: var(--orange); font-weight: 900; text-transform: uppercase; font-size: 12px; }

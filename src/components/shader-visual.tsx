@@ -8,8 +8,11 @@ export interface ShaderEntry { title: string; speed: number; playAudio?: boolean
 
 const vertex = "attribute vec2 p; void main() { gl_Position = vec4(p, 0.0, 1.0); }";
 
-export default function ShaderVisual({ shader, paused, revision }: { shader: ShaderEntry; paused: boolean; revision: number }) {
+export default function ShaderVisual({ shader, paused, revision, crossfade = false }: { shader: ShaderEntry; paused: boolean; revision: number; crossfade?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const outgoingRef = useRef<HTMLImageElement>(null);
+  const fadeRef = useRef<Animation | null>(null);
+  const hasFrame = useRef(false);
   const pointer = useRef({ x: 0.5, y: 0.5 });
   const timeline = useRef({ key: "", elapsed: 0 });
   const pausedRef = useRef(paused);
@@ -18,6 +21,21 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
   pausedRef.current = paused;
 
   useEffect(() => {
+    if (crossfade) return;
+    fadeRef.current?.cancel();
+    if (outgoingRef.current) outgoingRef.current.hidden = true;
+  }, [crossfade]);
+
+  useEffect(() => {
+    const outgoing = outgoingRef.current;
+    fadeRef.current?.cancel();
+    if (outgoing) {
+      outgoing.hidden = true;
+      if (crossfade && hasFrame.current && canvasRef.current && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        outgoing.src = canvasRef.current.toDataURL();
+        outgoing.hidden = false;
+      }
+    }
     setSource("");
     setError("");
     if (shader.source) { setSource(shader.source); return; }
@@ -81,6 +99,7 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
     if (timeline.current.key !== key) timeline.current = { key, elapsed: 0 };
     let frame = 0;
     let previous = 0;
+    let firstFrame = true;
     const draw = (timestamp: number) => {
       if (!pausedRef.current && !reduced.matches) timeline.current.elapsed += previous ? Math.min(timestamp - previous, 50) / 1000 * shader.speed : 0;
       previous = timestamp;
@@ -91,6 +110,16 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
       const levels = audioLevels.live ? audioLevels : audioLevels.playing ? simulatedLevels(timestamp / 1000) : null;
       gl.uniform4f(audio, levels?.bass ?? 0, levels?.mid ?? 0, levels?.treble ?? 0, levels?.level ?? 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+      hasFrame.current = true;
+      if (firstFrame) {
+        firstFrame = false;
+        const outgoing = outgoingRef.current;
+        if (outgoing && !outgoing.hidden) {
+          const fade = outgoing.animate([{ opacity: 1 }, { opacity: 0 }], { duration: reduced.matches ? 0 : 1200, easing: "ease-in-out", fill: "forwards" });
+          fadeRef.current = fade;
+          fade.onfinish = () => { outgoing.hidden = true; };
+        }
+      }
       frame = requestAnimationFrame(draw);
     };
     frame = requestAnimationFrame(draw);
@@ -100,13 +129,25 @@ export default function ShaderVisual({ shader, paused, revision }: { shader: Sha
       gl.deleteProgram(program);
       gl.deleteBuffer(buffer);
     };
-  }, [source, revision, shader.speed, shader.file]);
+  }, [source, revision, shader.speed]);
 
-  return <>
+  useEffect(() => {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    const stopFade = () => {
+      if (!reduced.matches) return;
+      fadeRef.current?.cancel();
+      if (outgoingRef.current) outgoingRef.current.hidden = true;
+    };
+    reduced.addEventListener("change", stopFade);
+    return () => { reduced.removeEventListener("change", stopFade); fadeRef.current?.cancel(); };
+  }, []);
+
+  return <div className="shader-stage">
     <canvas ref={canvasRef} width={960} height={340} aria-label={`Shader visual: ${shader.title}`} onPointerMove={event => {
       const bounds = event.currentTarget.getBoundingClientRect();
       pointer.current = { x: (event.clientX - bounds.left) / bounds.width, y: (event.clientY - bounds.top) / bounds.height };
     }} />
+    <img ref={outgoingRef} className="shader-outgoing" alt="" aria-hidden="true" hidden />
     {error && <p className="shader-error" role="status">{error}</p>}
-  </>;
+  </div>;
 }

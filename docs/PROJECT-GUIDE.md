@@ -30,7 +30,19 @@ The archive is untrusted: a suspicious obfuscated PHP entry point was discovered
 
 ## Console Controls
 
+### Full Lab Keyboard
+
+Local expansion on 2026-11-04: Lab now has 26 square letter pads in three staggered QWERTY rows (`QWERTYUIOP`, `ASDFGHJKL`, `ZXCVBNM`), including at 320px. The first 17 mappings are preserved. Added K: Prism, L: Silk Ribbons, Z: Gyroid, X: Radar Bloom, C: Nebula, V: Luminous Lattice, B: Body of Light, N: Circuit Flow, M: Eclipse. Each new shader uses bass, mid, treble and overall audio levels with restrained modulation and continues time-based movement without audio. These are newly authored GLSL visuals, not reconstructed historical media. The shader configuration cap is 26; other contexts retain their existing 17-pad layout and Music catalogue limit.
+
+Visual 24/B was revised locally from Petal Engine to Body of Light after the user found it too similar to Mandala (14). Its original procedural composition is a seated luminous human silhouette, translucent ribs, spine, flowing meridians, seven energy points, aura and companion figures. Following feedback about dark space and weak reaction, a full-frame domain-warped plasma field and brighter plasma-filled body were added. Square-root-shaped audio bands reveal quieter signals: bass expands the figure and plasma flow, mids shift colour and flow, treble accents filaments, and overall level increases radiance. The baseline keeps moving without audio. GPU regression checks require over 85% illuminated frame coverage in silence and a measurable response at 0.08 audio input. It uses broad luminous-body/meditative imagery, with no copied painting, image texture or artist shader source. Mandala and the remaining mappings are unchanged. Local review only.
+
+`[` toggles fullscreen through the same action as its icon, supporting native and CSS fallback modes; `]` toggles visual auto-play while Lab is selected and its shader list is ready. Held-key repetition, modifier shortcuts and text/form inputs remain excluded. Tooltips and `aria-keyshortcuts` expose the bindings. The approved 1.2-second automatic dissolve and audio pause/stop override remain unchanged.
+
+Verified locally: 34 unit tests, static build with TypeScript and 18 browser tests passed. All 26 programs compiled and produced nonblank WebGL pixels with a measured pixel difference between zero and active audio inputs. Desktop/390px/320px checks preserve exactly three letter rows, square keys and no horizontal overflow. Real localhost checks confirmed all nine new selections and both bracket toggles. No commits, pushes or deployment for this expansion or the pending crossfade.
+
 ### Lab Visual Auto-Play
+
+Local crossfade preview (2026-11-04, not committed or deployed): automatic selections hold a snapshot of the outgoing frame while the next shader loads and compiles, then dissolve it over the new animation for 1.2 seconds with ease-in-out timing. Only one WebGL shader runs at a time; the outgoing image is static during the dissolve. Manual selections remain immediate. Reduced motion skips the transition, including when enabled mid-fade. Animation cleanup runs on interruption/unmount. Audio pause/stop behaviour is unchanged. Static build, 34 unit tests and 15 browser tests passed; real-time localhost midpoint captures at 1440/390px confirmed opacity 0.5, no shader errors and no horizontal overflow. User review of duration and appearance remains pending.
 
 Audio pause/stop override (2026-11-04): timer-driven visual changes never request audio playback. Audio stays paused or stopped while visuals continue cycling. Explicit manual visual selection (including reselecting the current pad) can start audio again, as can the player's Play control. Automatic and manual selections are tracked separately and covered by native-audio browser regression tests.
 
@@ -56,7 +68,7 @@ The map-box heading is a looping ticker with the default message `Greetings groo
 
 Top-level section labels are uppercase in heavy Helvetica Neue (weight 900), with Helvetica/sans-serif fallbacks. The exported `fonts/50_Akzidenz Grotesk BE Super.ttf` appears closer to the original heavy lettering, but webfont redistribution clearance is not recorded; it has not been copied or embedded. The system-font choice is not a claim of exact typeface reproduction. Static build and seven Chromium browser tests passed for this typography update on 2026-11-01.
 
-The bottom content bank has 17 square pads in a staggered 10+7 desktop arrangement. Each face shows only its index and assigned keyboard key; accessible labels identify content and empty slots are disabled. Three square top-right buttons span the column: AV LAB, Community, Jukebox. AV LAB shows Music, Videos, Games and Lab; Community shows SoftFood Cafe and Twat Modern; Jukebox has no submenu. About Us, Contact and Info buttons are removed. Mobile reflows the keys and navigation without horizontal overflow. Community services and Jukebox playback remain unrestored.
+The Lab content bank has 26 square pads in three QWERTY rows; other contexts retain 17 pads. Each face shows only its index and assigned keyboard key; accessible labels identify content and empty slots are disabled. Three square top-right buttons span the column: AV LAB, Community, Jukebox. AV LAB shows Music, Videos, Games and Lab; Community shows SoftFood Cafe and Twat Modern; Jukebox has no submenu. About Us, Contact and Info buttons are removed. Community services and Jukebox playback remain unrestored.
 
 ## Technical Contract
 

@@ -21,11 +21,13 @@ test("the four AV LAB contexts and top sections reset selection", () => {
   assert.equal(consoleReducer(selected, { type: "section", section: "unknown" }), selected);
 });
 
-test("all 17 numbered pads have stable keys and pointer/keyboard actions match", () => {
-  assert.equal(padKeys.length, 17);
-  assert.equal(new Set(padKeys).size, 17);
+test("all 26 letter pads have stable keys and pointer/keyboard actions match", () => {
+  assert.equal(padKeys.join(""), "qwertyuiopasdfghjklzxcvbnm");
+  assert.equal(new Set(padKeys).size, 26);
+  const lab = consoleReducer(initialState, { type: "lab-items", count: 26 });
   for (const [slot, key] of padKeys.entries()) {
     assert.deepEqual(keyboardAction(key.toUpperCase()), { type: "slot", slot });
+    assert.deepEqual(consoleReducer(lab, keyboardAction(key)), consoleReducer(lab, { type: "slot", slot }));
   }
   for (const [slot, key] of ["q", "w", "e", "r", "t", "y"].entries()) {
     assert.deepEqual(consoleReducer(initialState, keyboardAction(key.toUpperCase())), consoleReducer(initialState, { type: "slot", slot }));
@@ -40,6 +42,8 @@ test("pause, reset and escape are reversible without changing content", () => {
   assert.equal(consoleReducer({ ...initialState, context: "music" }, keyboardAction("Escape")).context, "lab");
   assert.equal(keyboardAction("Tab"), null);
   assert.equal(consoleReducer(initialState, { type: "slot", slot: -1 }), initialState);
+  assert.deepEqual(keyboardAction("["), { type: "fullscreen" });
+  assert.deepEqual(keyboardAction("]"), { type: "auto-visuals" });
 });
 
 test("Music pads, keyboard selection and player transport share catalogue selection", () => {

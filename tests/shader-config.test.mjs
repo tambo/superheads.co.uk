@@ -6,7 +6,10 @@ import { consoleReducer, initialState } from "../src/lib/console-state.mjs";
 
 test("shipped config parses and files exist", () => {
   const shaders = parseShaderConfig(JSON.parse(readFileSync("public/config/shaders.json", "utf8")));
-  assert.ok(shaders.length >= 3);
+  assert.equal(shaders.length, 26);
+  assert.equal(shaders[13].title, "Mandala");
+  assert.equal(shaders[23].title, "Body of Light");
+  assert.equal(shaders[23].file, "/shaders/body-of-light.frag");
   for (const shader of shaders) assert.ok(readFileSync(`public${shader.file}`, "utf8").includes("mainImage"));
 });
 
@@ -18,12 +21,12 @@ test("rejects unsafe or malformed entries", () => {
   assert.throws(() => parseShaderConfig({ shaders: [{ title: "x" }] }));
 });
 
-test("defaults, clamping and 17 entry cap", () => {
+test("defaults, clamping and 26 entry cap", () => {
   const [one] = parseShaderConfig({ shaders: [{ source: "void mainImage(out vec4 c, in vec2 f){c=vec4(1.);}", speed: 99 }] });
   assert.equal(one.title, "Shader 1");
   assert.equal(one.speed, 10);
   const many = parseShaderConfig({ shaders: Array.from({ length: 30 }, () => ({ source: "mainImage" })) });
-  assert.equal(many.length, 17);
+  assert.equal(many.length, 26);
   assert.match(buildFragmentSource("X"), /mainImage\(color/);
 });
 

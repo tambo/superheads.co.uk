@@ -1,5 +1,5 @@
 export const shaderConfigUrl = "/config/shaders.json";
-export const maxShaders = 17;
+export const maxShaders = 26;
 const maxSourceLength = 20000;
 
 export function parseShaderConfig(data) {

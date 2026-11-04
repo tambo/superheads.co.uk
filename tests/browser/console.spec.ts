@@ -94,6 +94,42 @@ test("automatic visuals preserve paused and stopped audio while manual visual se
   await expect(page.getByRole("button", { name: "Pause audio", exact: true })).toBeVisible();
 });
 
+test("automatic shader changes hold the outgoing frame then dissolve into the ready shader", async ({ page }) => {
+  await page.addInitScript(() => { Math.random = () => 0; });
+  let releaseShader: () => void = () => {};
+  const ready = new Promise<void>(resolve => { releaseShader = resolve; });
+  await page.route("**/shaders/tunnel.frag", async route => { await ready; await route.continue(); });
+  await page.goto("/");
+  await expect(page.locator("canvas")).toHaveAttribute("aria-label", "Shader visual: Plasma");
+  await expect.poll(() => page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL().length)).toBeGreaterThan(10000);
+  await page.clock.install();
+  await page.getByRole("button", { name: "Auto-play visuals", exact: true }).click();
+  await page.clock.fastForward(5000);
+  const outgoing = page.locator(".shader-outgoing");
+  await expect(outgoing).toBeVisible();
+  await expect(outgoing).toHaveAttribute("src", /^data:image\/png/);
+  expect(await outgoing.evaluate(element => element.getAnimations().length)).toBe(0);
+  releaseShader();
+  await expect.poll(() => page.locator(".shader-stage canvas").evaluate((canvas: HTMLCanvasElement) => canvas.getContext("webgl") !== null)).toBe(true);
+  await page.clock.runFor(100);
+  await expect.poll(() => outgoing.evaluate(element => element.getAnimations().length)).toBe(1);
+  const opacity = await outgoing.evaluate(element => {
+    const fade = element.getAnimations()[0];
+    fade.pause();
+    fade.currentTime = 600;
+    return Number(getComputedStyle(element).opacity);
+  });
+  expect(opacity).toBeGreaterThan(0.35);
+  expect(opacity).toBeLessThan(0.65);
+  await outgoing.evaluate(element => element.getAnimations()[0].finish());
+  await expect(outgoing).toBeHidden();
+  await page.locator(".pad-15").click();
+  await expect(outgoing).toBeHidden();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.clock.fastForward(10000);
+  await expect(outgoing).toBeHidden();
+});
+
 test("Checker Warp on pad 16 renders and remains animated", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".pad-15")).toHaveAccessibleName(/Checker Warp/);
@@ -153,7 +189,7 @@ test("three sections switch their submenus and retain shared keyboard and pointe
   page.on("pageerror", error => errors.push(error.message));
   await page.goto("/");
   await expect(page.locator(".context-tiles button")).toHaveCount(4);
-  await expect(page.locator(".pad")).toHaveCount(17);
+  await expect(page.locator(".pad")).toHaveCount(26);
   await expect(page.locator(".section-tiles button")).toHaveText(["AV LAB", "COMMUNITY", "JUKEBOX"]);
   await expect(page.locator(".section-tiles button").first()).toHaveCSS("font-family", '"Helvetica Neue", Helvetica, sans-serif');
   await expect(page.locator(".context-tiles button")).toHaveText(["MUSIC", "VIDEOS", "GAMES", "LAB"]);
@@ -221,7 +257,15 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
     expect(padBank).not.toBeNull();
     expect(display).not.toBeNull();
     expect(pad!.width).toBeLessThanOrEqual(viewport.width > 900 ? 80 : viewport.width > 640 ? 90 : 58);
-    expect(pad!.width).toBeGreaterThanOrEqual(48);
+    expect(pad!.width).toBeGreaterThanOrEqual(viewport.width > 640 ? 48 : 23);
+    expect(pad!.height).toBeCloseTo(pad!.width, 0);
+    await expect(page.locator(".lab-keyboard .pad-row")).toHaveCount(3);
+    for (const [row, letters] of ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"].entries()) {
+      const buttons = page.locator(".lab-keyboard .pad-row").nth(row).locator(".pad");
+      await expect(buttons.locator("span")).toHaveText(letters.split(""));
+      const boxes = await buttons.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().y));
+      expect(Math.max(...boxes) - Math.min(...boxes)).toBeLessThan(1);
+    }
     expect(await page.locator(".pad").evaluateAll(buttons => buttons.every(button => button.scrollWidth <= button.clientWidth))).toBe(true);
     expect(padBank!.width / display!.width).toBeGreaterThan(0.72);
     const player = await page.locator(".audio-player").boundingBox();
