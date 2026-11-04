@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useReducer, useRef, useState } from "react";
-import { ArrowDownRight, Maximize, Minimize, Pause, Play, RotateCcw } from "lucide-react";
-import { contexts, sections, initialState, consoleReducer, keyboardAction, padKeys } from "../lib/console-state.mjs";
+import { ArrowDownRight, Maximize, Minimize, Pause, Play, RotateCcw, Shuffle } from "lucide-react";
+import { contexts, sections, initialState, consoleReducer, keyboardAction, padKeys, randomVisualStep } from "../lib/console-state.mjs";
 import AudioPlayer, { type AudioTrack } from "./audio-player";
 import ShaderVisual, { type ShaderEntry } from "./shader-visual";
 import { audioLevels } from "../lib/audio-levels.mjs";
@@ -116,6 +116,13 @@ export default function Collection() {
 
   const wantsAudio = state.context === "lab" && Boolean(shaders[state.slot]?.playAudio);
   useEffect(() => {
+    if (!state.autoVisuals || state.paused || state.context !== "lab" || shaders.length < 2) return;
+    const next = randomVisualStep(state.slot, shaders.length);
+    const timer = window.setTimeout(() => dispatch({ type: "slot", slot: next.slot }), next.delay);
+    return () => window.clearTimeout(timer);
+  }, [state.autoVisuals, state.paused, state.context, state.slot, shaders.length]);
+
+  useEffect(() => {
     if (wantsAudio && state.musicTracks.length && !audioLevels.playing) dispatch({ type: "audio-track", slot: state.audioIndex });
   }, [wantsAudio, state.slot, state.musicTracks.length]);
 
@@ -201,6 +208,7 @@ export default function Collection() {
           <button aria-label={state.paused ? "Play visual" : "Pause visual"} title="Play / pause (Space)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "pause" })}>{state.paused ? <Play /> : <Pause />}</button>
           <button aria-label="Restart visual" aria-keyshortcuts="Backspace" title="Restart (Backspace)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>
           <button aria-label="Fullscreen display" title="Fullscreen display" onClick={enterFullscreen}><Maximize /></button>
+          <button aria-label="Auto-play visuals" aria-pressed={state.autoVisuals} title="Auto-play visuals: random change every 5-10 seconds" disabled={state.context !== "lab" || shaders.length < 2} onClick={() => dispatch({ type: "auto-visuals" })}><Shuffle /></button>
         </div>
       </div>
     </section>

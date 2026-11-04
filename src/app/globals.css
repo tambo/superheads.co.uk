@@ -61,6 +61,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .transport > div { display: flex; gap: 5px; }
 .transport button { width: 32px; height: 32px; display: grid; place-items: center; }
 .transport svg { width: 16px; height: 16px; }
+.transport button[aria-pressed=true] { color: var(--yellow); border-color: var(--yellow); background: #121100; }
 .navigation .section-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
 .navigation .section-tiles button { width: 100%; height: auto; aspect-ratio: 1; display: grid; place-items: center; padding: 3px; text-align: center; font-family: "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; font-weight: 900; letter-spacing: 0; text-transform: uppercase; overflow-wrap: anywhere; }
 .section-tiles button[aria-pressed=true] { box-shadow: inset 0 0 0 3px #eee; }

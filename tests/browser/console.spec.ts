@@ -47,6 +47,45 @@ test("Music pads drive the PHP audio player and transport controls", async ({ pa
   await expect(page.locator(".pad-9")).toHaveAttribute("aria-pressed", "true");
 });
 
+test("visual auto-play changes randomly after 5-10 seconds and respects pause, off and context", async ({ page }) => {
+  await page.goto("/");
+  const toggle = page.getByRole("button", { name: "Auto-play visuals", exact: true });
+  await expect(toggle).toBeEnabled();
+  await expect(page.locator("canvas")).toHaveAttribute("aria-label", "Shader visual: Plasma");
+  await page.clock.install();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await page.clock.fastForward(4999);
+  await expect(page.locator(".pad-0")).toHaveAttribute("aria-pressed", "true");
+  await page.clock.fastForward(5001);
+  await expect(page.locator(".pad-0")).toHaveAttribute("aria-pressed", "false");
+  await page.getByRole("button", { name: "Pause visual", exact: true }).click();
+  const paused = await page.locator(".bank-heading > span").textContent();
+  await page.clock.fastForward(20000);
+  await expect(page.locator(".bank-heading > span")).toHaveText(paused!);
+  await page.getByRole("button", { name: "Play visual", exact: true }).click();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await page.clock.fastForward(20000);
+  await expect(page.locator(".bank-heading > span")).toHaveText(paused!);
+  await toggle.click();
+  await page.getByRole("button", { name: "GAMES", exact: true }).click();
+  await expect(toggle).toBeDisabled();
+  await page.clock.fastForward(20000);
+  await expect(page.locator(".display-copy h2")).toHaveText("Spak Invaders");
+});
+
+test("Checker Warp on pad 16 renders and remains animated", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".pad-15")).toHaveAccessibleName(/Checker Warp/);
+  await page.locator(".pad-15").click();
+  await expect(page.locator("canvas")).toHaveAttribute("aria-label", "Shader visual: Checker Warp");
+  await expect(page.locator(".shader-error")).toHaveCount(0);
+  const pixels = () => page.locator("canvas").evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
+  const first = await pixels();
+  await expect.poll(pixels).not.toBe(first);
+});
+
 test("unavailable PHP catalogue disables Music pads and supports retry", async ({ page }) => {
   await page.route("https://orphism.co.uk/audio/audio-list.php?*", route => route.abort());
   await page.goto("/");

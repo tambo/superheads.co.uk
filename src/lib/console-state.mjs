@@ -15,9 +15,15 @@ export const sections = [
   { id: "jukebox", label: "Jukebox", context: "jukebox", submenu: [] },
 ];
 export const padKeys = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f", "g", "h", "j"];
-export const initialState = { context: "lab", slot: 0, paused: false, revision: 0, musicTracks: [], audioIndex: 0, audioRevision: 0, labCount: null };
+export const initialState = { context: "lab", slot: 0, paused: false, revision: 0, musicTracks: [], audioIndex: 0, audioRevision: 0, labCount: null, autoVisuals: false };
+
+export function randomVisualStep(current, count, random = Math.random) {
+  const choice = Math.floor(random() * Math.max(0, count - 1));
+  return { slot: count > 1 ? choice >= current ? choice + 1 : choice : current, delay: 5000 + Math.floor(random() * 5001) };
+}
 
 export function consoleReducer(state, action) {
+  if (action.type === "auto-visuals") return { ...state, autoVisuals: !state.autoVisuals };
   if (action.type === "catalogue" && Array.isArray(action.tracks)) {
     return { ...state, musicTracks: action.tracks.slice(0, 17), slot: state.context === "music" ? 0 : state.slot, audioIndex: 0 };
   }

@@ -30,6 +30,14 @@ The archive is untrusted: a suspicious obfuscated PHP entry point was discovered
 
 ## Console Controls
 
+### Lab Visual Auto-Play
+
+Updated on 2026-11-04: Checker Warp (pad 16) uses lower bass/mid distortion and brightness gain. Overall audio level reduces the modulation further during intense passages, preserving the underlying timed warp and giving quieter passages more relative movement. This adjustment is local to Checker Warp; other shader/audio gains are unchanged. Listening-based tuning remains subjective.
+
+The shuffle icon beside fullscreen toggles visual auto-play, off by default. While enabled in Lab, it chooses a different loaded shader every randomly selected 5-10 seconds without immediate repeats. Visual pause and leaving Lab cancel the pending timer; returning/resuming starts a fresh interval. Manual pad selection restarts the interval, switching the toggle off keeps the selected visual, and the audio track is not shuffled. Timer cleanup also runs on unmount. The enabled button has a yellow pressed state and an accessible toggle label.
+
+Verification: 33 unit tests, TypeScript/static export and 13 Chromium browser tests passed, including timer boundaries, nonrepeating selection, pause/off/context cancellation and animated Checker Warp rendering. Desktop/mobile screenshots at 1440/390px show no horizontal overflow or shader errors. These changes have not been committed or deployed as part of this update.
+
 ### Tomaz Sounder Audio
 
 Local playback fix (2026-11-01): when opened at `http://localhost:3000`, both catalogue and stream URLs use `https://dev.orphism.co.uk`. Other hosts retain the production audio origin. Native audio uses anonymous CORS so the browser sends its actual Origin; staging rejects Referer-only localhost media requests. Real localhost `Minor Axis` MP3 playback and pause passed in Chromium without mocks. Use localhost rather than 127.0.0.1, which is not permitted by the existing Orphism staging configuration. No remote permissions or deployment were changed for this fix.
