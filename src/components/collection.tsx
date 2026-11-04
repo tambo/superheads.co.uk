@@ -118,13 +118,13 @@ export default function Collection() {
   useEffect(() => {
     if (!state.autoVisuals || state.paused || state.context !== "lab" || shaders.length < 2) return;
     const next = randomVisualStep(state.slot, shaders.length);
-    const timer = window.setTimeout(() => dispatch({ type: "slot", slot: next.slot }), next.delay);
+    const timer = window.setTimeout(() => dispatch({ type: "slot", slot: next.slot, automatic: true }), next.delay);
     return () => window.clearTimeout(timer);
   }, [state.autoVisuals, state.paused, state.context, state.slot, shaders.length]);
 
   useEffect(() => {
-    if (wantsAudio && state.musicTracks.length && !audioLevels.playing) dispatch({ type: "audio-track", slot: state.audioIndex });
-  }, [wantsAudio, state.slot, state.musicTracks.length]);
+    if (!state.automaticVisual && wantsAudio && state.musicTracks.length && !audioLevels.playing) dispatch({ type: "audio-track", slot: state.audioIndex });
+  }, [wantsAudio, state.manualVisualRevision, state.musicTracks.length]);
 
   useEffect(() => {
     const release = () => { if (!document.fullscreenElement) screen.orientation?.unlock?.(); };

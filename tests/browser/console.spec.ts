@@ -75,6 +75,25 @@ test("visual auto-play changes randomly after 5-10 seconds and respects pause, o
   await expect(page.locator(".display-copy h2")).toHaveText("Spak Invaders");
 });
 
+test("automatic visuals preserve paused and stopped audio while manual visual selection restarts it", async ({ page }) => {
+  await page.goto("/");
+  await page.locator(".pad-1").click();
+  await expect(page.getByRole("button", { name: "Pause audio", exact: true })).toBeVisible();
+  await page.clock.install();
+  await page.getByRole("button", { name: "Auto-play visuals", exact: true }).click();
+  await page.getByRole("button", { name: "Pause audio", exact: true }).click();
+  await page.clock.fastForward(10000);
+  await expect(page.locator(".pad-1")).toHaveAttribute("aria-pressed", "false");
+  expect(await page.locator("audio").evaluate((audio: HTMLAudioElement) => audio.paused)).toBe(true);
+  await page.locator(".pad-2").click();
+  await expect(page.getByRole("button", { name: "Pause audio", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Stop audio", exact: true }).click();
+  await page.clock.fastForward(20000);
+  expect(await page.locator("audio").evaluate((audio: HTMLAudioElement) => ({ paused: audio.paused, time: audio.currentTime }))).toEqual({ paused: true, time: 0 });
+  await page.locator(".pad[aria-pressed=true]").click();
+  await expect(page.getByRole("button", { name: "Pause audio", exact: true })).toBeVisible();
+});
+
 test("Checker Warp on pad 16 renders and remains animated", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".pad-15")).toHaveAccessibleName(/Checker Warp/);

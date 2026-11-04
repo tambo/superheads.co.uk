@@ -15,7 +15,7 @@ export const sections = [
   { id: "jukebox", label: "Jukebox", context: "jukebox", submenu: [] },
 ];
 export const padKeys = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f", "g", "h", "j"];
-export const initialState = { context: "lab", slot: 0, paused: false, revision: 0, musicTracks: [], audioIndex: 0, audioRevision: 0, labCount: null, autoVisuals: false };
+export const initialState = { context: "lab", slot: 0, paused: false, revision: 0, musicTracks: [], audioIndex: 0, audioRevision: 0, labCount: null, autoVisuals: false, manualVisualRevision: 0, automaticVisual: false };
 
 export function randomVisualStep(current, count, random = Math.random) {
   const choice = Math.floor(random() * Math.max(0, count - 1));
@@ -43,7 +43,7 @@ export function consoleReducer(state, action) {
   const context = contexts.find(context => context.id === state.context);
   const itemCount = state.context === "music" ? state.musicTracks.length : state.context === "lab" && state.labCount !== null ? state.labCount : context.items.length;
   if (action.type === "slot" && Number.isInteger(action.slot) && action.slot >= 0 && action.slot < itemCount) {
-    return state.context === "music" ? { ...state, slot: action.slot, audioIndex: action.slot, audioRevision: state.audioRevision + 1 } : { ...state, slot: action.slot, paused: false };
+    return state.context === "music" ? { ...state, slot: action.slot, audioIndex: action.slot, audioRevision: state.audioRevision + 1 } : { ...state, slot: action.slot, paused: false, automaticVisual: action.automatic === true, manualVisualRevision: state.manualVisualRevision + (state.context === "lab" && !action.automatic ? 1 : 0) };
   }
   if (action.type === "pause") return { ...state, paused: !state.paused };
   if (action.type === "reset") return { ...state, revision: state.revision + 1, paused: false };

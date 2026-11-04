@@ -22,3 +22,14 @@ test("visual autoplay is off by default and toggles without changing track or vi
   assert.equal(enabled.audioIndex, initialState.audioIndex);
   assert.equal(consoleReducer(enabled, { type: "auto-visuals" }).autoVisuals, false);
 });
+
+test("automatic visual changes do not request audio but manual reselection does", () => {
+  const loaded = consoleReducer(initialState, { type: "lab-items", count: 17 });
+  const automatic = consoleReducer(loaded, { type: "slot", slot: 15, automatic: true });
+  assert.equal(automatic.automaticVisual, true);
+  assert.equal(automatic.manualVisualRevision, loaded.manualVisualRevision);
+  assert.equal(automatic.audioRevision, loaded.audioRevision);
+  const manual = consoleReducer(automatic, { type: "slot", slot: 15 });
+  assert.equal(manual.automaticVisual, false);
+  assert.equal(manual.manualVisualRevision, loaded.manualVisualRevision + 1);
+});
