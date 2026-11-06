@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /*.txt$
+Allow: /robots.txt$
