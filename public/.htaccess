@@ -2,6 +2,11 @@ Options -Indexes
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
 
+# Next.js RSC payloads (index.txt) must never be indexed or surfaced as pages
+<FilesMatch "\.txt$">
+    Header set X-Robots-Tag "noindex"
+</FilesMatch>
+
 <FilesMatch "\.(php|phtml|phar|asp|aspx|swf|fla)$">
     Require all denied
 </FilesMatch>
