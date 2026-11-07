@@ -6,6 +6,7 @@
     "node": ">=20.9.0"
   },
   "scripts": {
+    "videos:sync": "node scripts/sync-youtube.mjs",
     "check:runtime": "node scripts/check-runtime.mjs",
     "preinstall": "npm run check:runtime",
     "predev": "npm run check:runtime",

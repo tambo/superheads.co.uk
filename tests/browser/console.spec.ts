@@ -354,3 +354,18 @@ test("shader canvas fills a landscape phone screen in fullscreen", async ({ page
     return { box, ratio: Math.abs(buffer.width / buffer.height - 844 / 390) < 0.02 };
   }).toMatchObject({ box: { x: 0, y: 0, width: 844, height: 390 }, ratio: true });
 });
+
+test("Videos section builds pads from config, shows an overlay and supports QWERTY keys", async ({ page }) => {
+  await page.route(/youtube(-nocookie)?\.com/, route => route.abort());
+  await page.route("**/config/videos.json", route => route.fulfill({ json: {
+    effects: [{ name: "Beat Rings", file: "/video-effects/beat-rings.frag", blend: "screen" }, { name: "Neon Grid", file: "/video-effects/neon-grid.frag", blend: "screen" }],
+    videos: [{ id: "aaaaaaaaaaa", title: "First" }, { id: "bbbbbbbbbbb", title: "Second" }, { id: "ccccccccccc", title: "Third" }],
+  } }));
+  await page.goto("/");
+  await page.getByRole("button", { name: "VIDEOS", exact: true }).click();
+  await expect(page.locator(".video-overlay")).toBeVisible();
+  await expect(page.locator(".pad-bank .pad:not([disabled])")).toHaveCount(3);
+  await page.keyboard.press("w");
+  await expect(page.locator("[aria-live=polite]").filter({ hasText: "Neon Grid" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /pause/i }).first()).toBeEnabled();
+});

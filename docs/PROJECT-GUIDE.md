@@ -142,3 +142,11 @@ The AV Lab display renders WebGL fragment shaders listed in `public/config/shade
 AV Lab shader playlist now ships 17 newly authored shaders (all pads used, all audio-reactive via iAudio and starting the audio player when selected): Plasma, Tunnel, Pulse Plasma, Lava, Warp, Kaleidoscope, Ripples, Aurora, Metaballs, Interference, Voronoi, Fire, Starfield, Mandala, Waves, Checker Warp and Julia. All compile in headless Chromium (software WebGL).
 
 Fullscreen: the display uses the Fullscreen API where available (hiding navigation UI and requesting landscape orientation lock where supported), otherwise a CSS fixed overlay (iPhone Safari cannot hide its toolbar for non-video content). The shader canvas renders at the displayed size (capped at about 1.6M pixels). Adding the site to the iOS Home Screen or installing it as an app launches it without browser chrome (`manifest.webmanifest`, `appleWebApp`, `viewport-fit=cover`). No app icons have been added.
+
+## AV Lab videos
+
+The Videos section plays muted YouTube videos (IFrame API) under an audio-reactive WebGL overlay driven by the Jukebox, with the same controls and QWERTY pads as the Lab. Configure it in `public/config/videos.json`: `effects` (shader file in `public/video-effects/`, CSS `blend`, `filter` amounts) and `videos` (11-character YouTube `id`, `title`, optional `effect` and `start`; maximum 26).
+
+Fill `videos` from the channel in `channel.handle` with `npm run videos:sync` (uses `YOUTUBE_API_KEY` if set, otherwise the channel RSS feed, which lists about 15 latest videos) or the manually triggered "Sync YouTube videos" workflow, which commits to `develop`. Manually edited titles, effects and start times are kept.
+
+Limits: browsers cannot read pixels from a YouTube iframe, so effects are layered over and filtered on the video rather than warping it. Videos that disallow embedding show a message with a link. No video IDs are shipped until the sync is run.

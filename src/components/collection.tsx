@@ -5,6 +5,8 @@ import { ArrowDownRight, Maximize, Minimize, Pause, Play, RotateCcw, Shuffle } f
 import { contexts, sections, initialState, consoleReducer, keyboardAction, padKeys, randomVisualStep } from "../lib/console-state.mjs";
 import AudioPlayer, { type AudioTrack } from "./audio-player";
 import ShaderVisual, { type ShaderEntry } from "./shader-visual";
+import VideoVisual, { type VideoEntry } from "./video-visual";
+import { videoConfigUrl, parseVideoConfig } from "../lib/video-config.mjs";
 import { audioLevels } from "../lib/audio-levels.mjs";
 import { shaderConfigUrl, parseShaderConfig } from "../lib/shader-config.mjs";
 import { artist, audioOrigin, audioCatalogueUrl, parseAudioCatalogue } from "../lib/audio-catalog.mjs";
@@ -79,10 +81,13 @@ export default function Collection() {
   const [catalogueError, setCatalogueError] = useState("");
   const [catalogueAttempt, setCatalogueAttempt] = useState(0);
   const [shaders, setShaders] = useState<ShaderEntry[]>([]);
+  const [videos, setVideos] = useState<VideoEntry[]>([]);
   const displayRef = useRef<HTMLDivElement>(null);
   const fullscreenButtonRef = useRef<HTMLButtonElement>(null);
   const context = contexts.find(item => item.id === state.context)!;
-  const items = state.context === "music" ? state.musicTracks.map((track: AudioTrack) => track.title) : state.context === "lab" && shaders.length ? shaders.map(shader => shader.title) : context.items;
+  const items = state.context === "music" ? state.musicTracks.map((track: AudioTrack) => track.title) : state.context === "lab" && shaders.length ? shaders.map(shader => shader.title) : state.context === "videos" && videos.length ? videos.map(video => video.title) : context.items;
+  const visualContext = state.context === "lab" || state.context === "videos";
+  const visualCount = state.context === "videos" ? videos.length : shaders.length;
   const selected = items[state.slot] || (state.context === "music" ? "Tomaz Sounder" : context.label);
   const section = sections.find(item => item.context === state.context || item.submenu.includes(state.context))!;
   const renderPad = (slot: number) => <button key={slot} className={`pad pad-${slot}`} disabled={!items[slot]} aria-pressed={Boolean(items[slot]) && state.slot === slot} aria-keyshortcuts={padKeys[slot].toUpperCase()} aria-label={items[slot] ? `${slot + 1}, ${padKeys[slot].toUpperCase()}: ${items[slot]}` : `${slot + 1}, ${padKeys[slot].toUpperCase()}: empty`} title={`${slot + 1} / ${padKeys[slot].toUpperCase()}${items[slot] ? `: ${items[slot]}` : ""}`} onClick={() => dispatch({ type: "slot", slot })}><small>{slot + 1}</small><span>{padKeys[slot].toUpperCase()}</span></button>;
@@ -115,13 +120,24 @@ export default function Collection() {
     return () => controller.abort();
   }, []);
 
-  const wantsAudio = state.context === "lab" && Boolean(shaders[state.slot]?.playAudio);
   useEffect(() => {
-    if (!state.autoVisuals || state.paused || state.context !== "lab" || shaders.length < 2) return;
-    const next = randomVisualStep(state.slot, shaders.length);
+    const controller = new AbortController();
+    fetch(videoConfigUrl, { signal: controller.signal, cache: "no-cache" }).then(async response => {
+      if (!response.ok) throw new Error("Video config unavailable");
+      const parsed: VideoEntry[] = parseVideoConfig(await response.json()).videos;
+      setVideos(parsed);
+      dispatch({ type: "video-items", count: parsed.length });
+    }).catch(() => {});
+    return () => controller.abort();
+  }, []);
+
+  const wantsAudio = (state.context === "lab" && Boolean(shaders[state.slot]?.playAudio)) || (state.context === "videos" && videos.length > 0);
+  useEffect(() => {
+    if (!state.autoVisuals || state.paused || !visualContext || visualCount < 2) return;
+    const next = randomVisualStep(state.slot, visualCount);
     const timer = window.setTimeout(() => dispatch({ type: "slot", slot: next.slot, automatic: true }), next.delay);
     return () => window.clearTimeout(timer);
-  }, [state.autoVisuals, state.paused, state.context, state.slot, shaders.length]);
+  }, [state.autoVisuals, state.paused, state.context, state.slot, visualCount]);
 
   useEffect(() => {
     if (!state.automaticVisual && wantsAudio && state.musicTracks.length && !audioLevels.playing) dispatch({ type: "audio-track", slot: state.audioIndex });
@@ -165,15 +181,15 @@ export default function Collection() {
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || target?.closest("input, textarea, select, [contenteditable='true'], [role='textbox']")) return;
       if (event.key === " " && target?.closest("button, a")) return;
       const action = keyboardAction(event.key);
-      if (!action || (action.type === "pause" && state.context !== "lab")) return;
-      if (action.type === "auto-visuals" && (state.context !== "lab" || shaders.length < 2)) return;
+      if (!action || (action.type === "pause" && !visualContext)) return;
+      if (action.type === "auto-visuals" && (!visualContext || visualCount < 2)) return;
       event.preventDefault();
       if (action.type === "fullscreen") fullscreenButtonRef.current?.click();
       else dispatch(action);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state.context, pseudoFullscreen, shaders.length]);
+  }, [state.context, pseudoFullscreen, visualCount, visualContext]);
 
   const changeContext = (identifier: string) => {
     dispatch({ type: "context", context: identifier });
@@ -203,19 +219,19 @@ export default function Collection() {
     <section className="screen-section" aria-label="Main display">
       <div className={pseudoFullscreen ? "display pseudo-fullscreen" : "display"} ref={displayRef}>
         {pseudoFullscreen && <button className="exit-fullscreen" aria-label="Exit fullscreen" title="Exit fullscreen (Escape)" onClick={() => setPseudoFullscreen(false)}><Minimize /></button>}
-        {state.context === "lab" && shaders.length ? <ShaderVisual shader={shaders[state.slot] || shaders[0]} paused={state.paused} revision={state.revision} crossfade={state.automaticVisual} /> : state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
+        {state.context === "videos" && videos.length ? <VideoVisual video={videos[state.slot] || videos[0]} paused={state.paused} revision={state.revision} /> : state.context === "lab" && shaders.length ? <ShaderVisual shader={shaders[state.slot] || shaders[0]} paused={state.paused} revision={state.revision} crossfade={state.automaticVisual} /> : state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
           <span className="eyebrow">{context.label}</span>
           <h2>{selected}</h2>
-          <p>{state.context === "music" ? artist.excerpt : section.id === "community" ? "The original community service has not been restored." : "Original collection entry. Legacy playback is not yet restored."}</p>
+          <p>{state.context === "music" ? artist.excerpt : state.context === "videos" ? "No videos are configured yet. Run the YouTube sync to fill this section." : section.id === "community" ? "The original community service has not been restored." : "Original collection entry. Legacy playback is not yet restored."}</p>
         </div>}
       </div>
       <div className="transport">
-        <span aria-live="polite">{selected}{state.context === "lab" && <small>{shaders.length ? " / shader" : " / visual study"}</small>}</span>
+        <span aria-live="polite">{selected}{state.context === "lab" && <small>{shaders.length ? " / shader" : " / visual study"}</small>}{state.context === "videos" && videos.length > 0 && <small> / {videos[state.slot]?.effect.name}</small>}</span>
         <div>
-          <button aria-label={state.paused ? "Play visual" : "Pause visual"} title="Play / pause (Space)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "pause" })}>{state.paused ? <Play /> : <Pause />}</button>
-          <button aria-label="Restart visual" aria-keyshortcuts="Backspace" title="Restart (Backspace)" disabled={state.context !== "lab"} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>
+          <button aria-label={state.paused ? "Play visual" : "Pause visual"} title="Play / pause (Space)" disabled={!visualContext || (state.context === "videos" && !videos.length)} onClick={() => dispatch({ type: "pause" })}>{state.paused ? <Play /> : <Pause />}</button>
+          <button aria-label="Restart visual" aria-keyshortcuts="Backspace" title="Restart (Backspace)" disabled={!visualContext || (state.context === "videos" && !videos.length)} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>
           <button ref={fullscreenButtonRef} aria-label="Fullscreen display" aria-keyshortcuts="[" title="Toggle fullscreen ([)" onClick={enterFullscreen}><Maximize /></button>
-          <button aria-label="Auto-play visuals" aria-keyshortcuts="]" aria-pressed={state.autoVisuals} title="Auto-play visuals (]): random change every 5-10 seconds" disabled={state.context !== "lab" || shaders.length < 2} onClick={() => dispatch({ type: "auto-visuals" })}><Shuffle /></button>
+          <button aria-label="Auto-play visuals" aria-keyshortcuts="]" aria-pressed={state.autoVisuals} title="Auto-play visuals (]): random change every 5-10 seconds" disabled={!visualContext || visualCount < 2} onClick={() => dispatch({ type: "auto-visuals" })}><Shuffle /></button>
         </div>
       </div>
     </section>
@@ -233,10 +249,10 @@ export default function Collection() {
     </aside>
     <section className="control-section" id="control-bank" aria-label="Content controls">
       <div className="bank-heading"><h2>{context.label.toUpperCase()}</h2><span>{selected.toUpperCase()}</span></div>
-      <div className={state.context === "lab" ? "pad-bank lab-keyboard" : "pad-bank"} aria-label="Keyboard content pads">
+      <div className={visualContext ? "pad-bank lab-keyboard" : "pad-bank"} aria-label="Keyboard content pads">
         <div className="pad-row pad-row-top">{Array.from({ length: 10 }, (_, slot) => renderPad(slot))}</div>
-        <div className="pad-row pad-row-bottom">{Array.from({ length: state.context === "lab" ? 9 : 7 }, (_, index) => renderPad(index + 10))}</div>
-        {state.context === "lab" && <div className="pad-row pad-row-third">{Array.from({ length: 7 }, (_, index) => renderPad(index + 19))}</div>}
+        <div className="pad-row pad-row-bottom">{Array.from({ length: visualContext ? 9 : 7 }, (_, index) => renderPad(index + 10))}</div>
+        {visualContext && <div className="pad-row pad-row-third">{Array.from({ length: 7 }, (_, index) => renderPad(index + 19))}</div>}
       </div>
       <p className="album">{state.context === "music" ? "artist:" : "from the album:"}<br /><em>{state.context === "music" ? artist.title : "a senseless act of beauty"}</em></p>
     </section>

@@ -1,0 +1,16 @@
+{
+  "_help": "AV Lab video visualiser playlist. Each video fills one letter key (max 26, QWERTY order) and is shown muted with an audio-reactive shader overlay driven by the Jukebox. 'videos' entries: id (11-character YouTube ID), title, optional effect (a name from 'effects'; default cycles through the list) and optional start (seconds). Effects: file (GLSL under /video-effects/ outputting premultiplied RGBA with iTime, iResolution, iMouse, iAudio), blend (CSS mix-blend-mode), speed, and filter amounts applied to the video at full level (hue degrees from mid, saturate from overall, contrast and brightness from bass, scale from bass). Refresh 'videos' from the channel with: npm run videos:sync (or the Sync YouTube videos workflow). Hand-edited effect, start and title values are kept.",
+  "channel": { "handle": "@tambo1972" },
+  "effects": [
+    { "name": "Beat Rings", "file": "/video-effects/beat-rings.frag", "blend": "screen", "filter": { "scale": 0.04, "brightness": 0.15 } },
+    { "name": "Spectrum Bars", "file": "/video-effects/spectrum-bars.frag", "blend": "screen", "filter": { "saturate": 0.4 } },
+    { "name": "Scan Glitch", "file": "/video-effects/scan-glitch.frag", "blend": "screen", "filter": { "hue": 25, "contrast": 0.2 } },
+    { "name": "Psychedelic", "file": "/video-effects/psychedelic.frag", "blend": "difference", "filter": { "hue": 60, "saturate": 0.6 } },
+    { "name": "Kaleido Lens", "file": "/video-effects/kaleido-lens.frag", "blend": "overlay", "filter": { "hue": 40, "scale": 0.06 } },
+    { "name": "Neon Grid", "file": "/video-effects/neon-grid.frag", "blend": "screen", "filter": { "brightness": 0.25, "contrast": 0.3 } },
+    { "name": "Vignette Pulse", "file": "/video-effects/vignette-pulse.frag", "blend": "normal", "filter": { "scale": 0.08, "brightness": 0.2 } },
+    { "name": "Halftone Dots", "file": "/video-effects/halftone-dots.frag", "blend": "screen", "filter": { "saturate": 0.5 } },
+    { "name": "Light Leaks", "file": "/video-effects/light-leaks.frag", "blend": "screen", "filter": { "hue": 30, "brightness": 0.2 } }
+  ],
+  "videos": []
+}
