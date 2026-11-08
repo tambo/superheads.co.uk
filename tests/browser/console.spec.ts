@@ -608,6 +608,54 @@ test("Videos section defaults to video audio, keeps shader off, and supports QWE
   expect(await page.locator(".transport").evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
 });
 
+test("intro and YouTube videos preserve proportions and fit centered in the display", async ({ page }) => {
+  await page.route(/youtube(-nocookie)?\.com/, route => route.abort());
+  await page.route("**/config/videos.json", route => route.fulfill({ json: {
+    effects: [{ name: "Beat Rings", file: "/video-effects/beat-rings.frag", blend: "screen" }],
+    videos: [{ id: "aaaaaaaaaaa", title: "First" }],
+  } }));
+  await page.goto("/");
+  const intro = page.getByLabel("Superheads introduction");
+  await expect.poll(() => intro.evaluate(video => (video as HTMLVideoElement).videoWidth)).toBe(2808);
+  await expect.poll(() => intro.evaluate(video => (video as HTMLVideoElement).videoHeight)).toBe(1416);
+
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const introGeometry = await page.evaluate(() => {
+      const displayElement = document.querySelector(".display")!;
+      const displayRect = displayElement.getBoundingClientRect();
+      const videoRect = document.querySelector(".intro-video")!.getBoundingClientRect();
+      return {
+        displayWidth: displayElement.clientWidth,
+        displayCenterY: displayRect.top + displayRect.height / 2,
+        video: { left: videoRect.left, top: videoRect.top, width: videoRect.width, height: videoRect.height },
+      };
+    });
+    expect(Math.abs(introGeometry.video.width - introGeometry.displayWidth)).toBeLessThan(1);
+    expect(introGeometry.video.width / introGeometry.video.height).toBeCloseTo(2808 / 1416, 2);
+    expect(introGeometry.video.top + introGeometry.video.height / 2).toBeCloseTo(introGeometry.displayCenterY, 0);
+  }
+
+  await enterLab(page);
+  await page.getByRole("button", { name: "VIDEOS", exact: true }).click();
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const geometry = await page.evaluate(() => {
+      const displayRect = document.querySelector(".display")!.getBoundingClientRect();
+      const displayElement = document.querySelector(".display")!;
+      const frameRect = document.querySelector(".video-frame")!.getBoundingClientRect();
+      return {
+        display: { left: displayRect.left + displayElement.clientLeft, top: displayRect.top + displayElement.clientTop, width: displayElement.clientWidth, height: displayElement.clientHeight },
+        frame: { left: frameRect.left, top: frameRect.top, width: frameRect.width, height: frameRect.height },
+      };
+    });
+    expect(Math.abs(geometry.frame.width - geometry.display.width)).toBeLessThan(1);
+    expect(geometry.frame.width / geometry.frame.height).toBeCloseTo(16 / 9, 2);
+    expect(Math.abs(geometry.frame.left + geometry.frame.width / 2 - (geometry.display.left + geometry.display.width / 2))).toBeLessThan(1);
+    expect(Math.abs(geometry.frame.top + geometry.frame.height / 2 - (geometry.display.top + geometry.display.height / 2))).toBeLessThan(1);
+  }
+});
+
 test("video player sends referrer identity and reports stalled playback with a retry", async ({ page }) => {
   await page.clock.install();
   await page.addInitScript(() => {
