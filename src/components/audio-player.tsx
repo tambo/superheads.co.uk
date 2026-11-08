@@ -1,18 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowDownRight, Pause, Play, SkipBack, SkipForward, Square, Volume2 } from "lucide-react";
+import { ChevronDown, ListMusic, Pause, Play, SkipBack, SkipForward, Square, Volume2 } from "lucide-react";
 import { artist, formatAudioTime } from "../lib/audio-catalog.mjs";
 import { audioLevels, bandLevels, smoothLevels } from "../lib/audio-levels.mjs";
 
 export interface AudioTrack { filename: string; title: string; source: string }
 
-export default function AudioPlayer({ tracks, index, revision, loading, error, onSelect, onRetry }: {
+export default function AudioPlayer({ tracks, index, revision, loading, error, suspended, onSelect, onRetry }: {
   tracks: AudioTrack[]; index: number; revision: number; loading: boolean; error: string;
-  onSelect: (index: number) => void; onRetry: () => void;
+  suspended: boolean; onSelect: (index: number) => void; onRetry: () => void;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const playlistToggleRef = useRef<HTMLButtonElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [playlistOpen, setPlaylistOpen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
@@ -78,11 +80,12 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
     setDuration(0);
     setPlaybackError("");
     audio.load();
-    if (track && revision > 0) audio.play().catch(error => {
+    if (track && revision > 0 && !suspended) audio.play().catch(error => {
       if (!cancelled && error.name !== "AbortError") setPlaybackError("Playback unavailable. Press play to retry.");
     });
+    else if (suspended) audio.pause();
     return () => { cancelled = true; };
-  }, [track?.source, revision, corsMode]);
+  }, [track?.source, revision, corsMode, suspended]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -91,7 +94,7 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
 
   const togglePlay = () => {
     const audio = audioRef.current;
-    if (!audio || !track) return;
+    if (!audio || !track || suspended) return;
     setPlaybackError("");
     if (!audio.paused) audio.pause();
     else audio.play().catch(() => setPlaybackError("Playback unavailable. Check streaming access."));
@@ -100,10 +103,34 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
   return <section className="audio-player" aria-label="Tomaz Sounder audio player">
     <header className="audio-player-heading">
       <img src="/artwork/home/4.svg" width="145" height="27" alt="superheads" />
-      <h2><ArrowDownRight aria-hidden="true" />JUKEBOX</h2>
+      <button ref={playlistToggleRef} className="audio-playlist-toggle" type="button" aria-label={playlistOpen ? "Hide playlist" : "Show playlist"} aria-expanded={playlistOpen} aria-controls="audio-playlist" title={playlistOpen ? "Hide playlist" : "Show playlist"} disabled={!tracks.length} onClick={() => setPlaylistOpen(open => !open)} onKeyDown={event => {
+        if (event.key === "Escape" && playlistOpen) setPlaylistOpen(false);
+      }}>
+        <ListMusic aria-hidden="true" /><ChevronDown aria-hidden="true" />
+      </button>
     </header>
+    {playlistOpen && <nav id="audio-playlist" className="audio-playlist" aria-label="Available audio tracks" onKeyDown={event => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setPlaylistOpen(false);
+        playlistToggleRef.current?.focus();
+      }
+    }}>
+      {tracks.map((item, trackIndex) => <button key={item.source} type="button" aria-label={`${trackIndex + 1}. ${item.title}`} aria-current={trackIndex === index ? "true" : undefined} title={item.title} onClick={() => {
+        onSelect(trackIndex);
+        setPlaylistOpen(false);
+        playlistToggleRef.current?.focus();
+      }}>
+        <span className="audio-playlist-index">{String(trackIndex + 1).padStart(2, "0")}</span>
+        <span className="audio-playlist-title">{item.title}</span>
+        <span className="audio-playlist-artist">{artist.title}{trackIndex === index && <small> · Playing</small>}</span>
+      </button>)}
+    </nav>}
     <div className="audio-now-playing">
       <strong>{track?.title || (loading ? "Loading tracks..." : "Tracks unavailable")}</strong>
+      {(error || playbackError) && <div className="audio-track-message" role="status" aria-live="polite">
+        <span>{playbackError || error}</span>{error && <button type="button" onClick={onRetry}>Retry</button>}
+      </div>}
       <span>{artist.title}</span>
       <output aria-label="Playback time">{formatAudioTime(elapsed)} / {formatAudioTime(duration)}</output>
     </div>
@@ -119,7 +146,7 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
           if (audio) { audio.pause(); audio.currentTime = 0; }
           setElapsed(0);
         }}><Square /></button>
-        <button className="audio-play" aria-label={playing ? "Pause audio" : "Play audio"} title={playing ? "Pause audio" : "Play audio"} disabled={!track} onClick={togglePlay}>{playing ? <Pause /> : <Play />}</button>
+        <button className="audio-play" aria-label={playing ? "Pause audio" : "Play audio"} title={suspended ? "Video audio is selected" : playing ? "Pause audio" : "Play audio"} disabled={!track || suspended} onClick={togglePlay}>{playing ? <Pause /> : <Play />}</button>
         <button aria-label="Next track" title="Next track" disabled={tracks.length < 2} onClick={() => onSelect((index + 1) % tracks.length)}><SkipForward /></button>
       </div>
       <label className="audio-volume"><Volume2 aria-hidden="true" /><input type="range" aria-label="Audio volume" min="0" max="1" step="0.01" value={volume} onChange={event => {
@@ -128,7 +155,6 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, o
         if (audioRef.current) audioRef.current.volume = value;
       }} /></label>
     </div>
-    {(error || playbackError) && <div className="audio-error" role="status"><span>{playbackError || error}</span>{error && <button onClick={onRetry}>Retry</button>}</div>}
     <audio key={corsMode || "plain"} ref={audioRef} crossOrigin={corsMode} src={track?.source} preload="none" onLoadedMetadata={event => {
       setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0);
       event.currentTarget.volume = volume;

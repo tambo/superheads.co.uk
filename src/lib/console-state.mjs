@@ -1,6 +1,6 @@
 export const contexts = [
   { id: "music", label: "Music", description: "from the album: a senseless act of beauty", items: ["The Crunch", "Junglator", "Lapsadaisical", "Trance Sexuality", "Rise & Shine", "Boogie Oogie"] },
-  { id: "videos", label: "Videos", description: "Videos with live, audio-reactive effects driven by the Jukebox.", items: ["The Crunch", "Junglator", "Lapsadaisical", "Trance Sexuality", "Rise & Shine", "Boogie Oogie"] },
+  { id: "videos", label: "Videos", description: "Moving images with optional shader overlays and a selectable audio source.", items: ["The Crunch", "Junglator", "Lapsadaisical", "Trance Sexuality", "Rise & Shine", "Boogie Oogie"] },
   { id: "games", label: "Games", description: "The original digital playground.", items: ["Spak Invaders"] },
   { id: "lab", label: "AV Lab", description: "The AV LAB: Our audio-visual playground", items: ["Interference", "Signal", "Orbit", "Interference II", "Signal II", "Orbit II"] },
   { id: "cafe", label: "SoftFood Cafe", description: "", items: ["SoftFood Cafe"] },
@@ -38,11 +38,12 @@ export function consoleReducer(state, action) {
   }
   if (action.type === "section") {
     const section = sections.find(section => section.id === action.section);
-    return section ? { ...state, context: section.context, slot: 0, paused: false } : state;
+    return section ? { ...state, context: section.context, slot: 0, paused: false, automaticVisual: false } : state;
   }
   if (action.type === "context" && contexts.some(context => context.id === action.context)) {
-    return { ...state, context: action.context, slot: action.context === "music" ? state.audioIndex : 0, paused: false };
+    return { ...state, context: action.context, slot: action.context === "music" ? state.audioIndex : 0, paused: false, automaticVisual: false };
   }
+  if (action.type === "manual-audio-source") return { ...state, automaticVisual: false };
   const context = contexts.find(context => context.id === state.context);
   const itemCount = state.context === "music" ? state.musicTracks.length : state.context === "lab" && state.labCount !== null ? state.labCount : state.context === "videos" && state.videoCount ? state.videoCount : context.items.length;
   if (action.type === "slot" && Number.isInteger(action.slot) && action.slot >= 0 && action.slot < itemCount) {
@@ -54,6 +55,8 @@ export function consoleReducer(state, action) {
 }
 
 export function keyboardAction(key) {
+  if (key === "'") return { type: "video-audio" };
+  if (key === "\\") return { type: "video-overlay" };
   if (key === "[") return { type: "fullscreen" };
   if (key === "]") return { type: "auto-visuals" };
   const lower = key.toLowerCase();

@@ -15,15 +15,30 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .console { width: min(1500px, 90%); margin: 56px auto 48px; display: grid; grid-template-columns: minmax(0, 3.45fr) minmax(240px, 1fr); gap: 18px; align-items: start; }
 .identity { align-self: end; padding-bottom: 5px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 40%); gap: 18px; align-items: end; min-width: 0; }
 .identity-copy { min-width: 0; }
- .audio-player { min-width: 0; width: 100%; padding: 10px 12px 8px; background: linear-gradient(#4a4a47, #353535); border: 1px solid #62625e; color: #fff; }
+.audio-player { position: relative; z-index: 4; min-width: 0; width: 100%; padding: 10px 12px 8px; background: linear-gradient(#4a4a47, #353535); border: 1px solid #62625e; color: #fff; }
 .audio-player-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .identity .audio-player-heading img { width: 125px; max-width: 40%; height: auto; }
+.audio-playlist-toggle { display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-color: #b8b8a7; background: #ff9e00; color: #5b5b56; }
+.audio-playlist-toggle svg:first-child { width: 17px; height: 17px; }
+.audio-playlist-toggle svg:last-child { width: 13px; height: 13px; transition: transform 120ms ease; }
+.audio-playlist-toggle[aria-expanded=true] svg:last-child { transform: rotate(180deg); }
+.audio-playlist { position: absolute; z-index: 5; top: 42px; right: 12px; display: grid; gap: 0; width: min(320px, calc(100% - 24px)); max-height: 180px; overflow-y: auto; overscroll-behavior: contain; margin: 0; padding: 3px; border: 1px solid #62625e; background: #1b1b19; scrollbar-color: #ff9700 #252522; }
+.audio-playlist button { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 7px; width: 100%; min-height: 31px; padding: 5px 6px; border: 0; border-bottom: 1px solid #33332f; background: transparent; text-align: left; font-size: 11px; }
+.audio-playlist button:last-child { border-bottom: 0; }
+.audio-playlist button[aria-current=true] { background: #2a260e; color: var(--yellow); }
+.audio-playlist-index { color: #aaa; font-variant-numeric: tabular-nums; }
+.audio-playlist-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.audio-playlist-artist { justify-self: end; color: #ccc; text-align: right; white-space: nowrap; font-size: 10px; }
+.audio-playlist-artist small { color: var(--yellow); font-size: 9px; text-transform: uppercase; }
 .audio-player-heading h2 { display: flex; align-items: center; margin: 0; font-size: 18px; font-weight: 900; color: var(--orange); }
 .audio-player-heading h2 svg { width: 20px; height: 20px; }
-.audio-now-playing { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 8px; padding: 10px; min-height: 61px; background: linear-gradient(110deg, #bb7900, #ffab00); border: 2px solid #888773; border-radius: 8px 8px 0 0; font-size: 12px; }
-.audio-now-playing strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.audio-now-playing { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto); grid-template-rows: minmax(0, 1fr) auto; align-items: center; gap: 5px 8px; height: 61px; min-height: 61px; overflow: hidden; padding: 8px 10px; background: linear-gradient(110deg, #bb7900, #ffab00); border: 2px solid #888773; border-radius: 8px 8px 0 0; font-size: 12px; }
+.audio-now-playing strong { grid-column: 1; grid-row: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.audio-track-message { grid-column: 2; grid-row: 1; display: flex; align-items: flex-start; gap: 4px; min-width: 0; max-height: 2.4em; overflow: auto; overscroll-behavior: contain; color: #fff; font-size: 9px; line-height: 1.2; text-align: right; overflow-wrap: anywhere; scrollbar-color: #fff8 #0000; }
+.audio-track-message span { min-width: 0; }
+.audio-track-message button { flex-shrink: 0; padding: 2px 4px; border-color: #fff8; background: #0004; color: #fff; font-size: 9px; }
 .audio-now-playing > span { grid-row: 2; font-size: 11px; }
-.audio-now-playing output { grid-row: 2; grid-column: 2; font-weight: 900; white-space: nowrap; }
+.audio-now-playing output { grid-row: 2; grid-column: 2; justify-self: end; font-weight: 900; white-space: nowrap; }
 .audio-seek { display: block; width: 100%; height: 12px; margin: 3px 0 5px; accent-color: var(--orange); }
 .audio-player-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .audio-transport { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
@@ -33,8 +48,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .audio-volume { display: flex; align-items: center; gap: 5px; min-width: 0; max-width: 120px; }
 .audio-volume svg { width: 18px; height: 18px; flex-shrink: 0; }
 .audio-volume input { min-width: 0; width: 100%; accent-color: var(--orange); }
-.audio-error { display: flex; align-items: center; gap: 8px; margin-top: 7px; font-size: 11px; line-height: 1.3; color: #fff; }
-.audio-error button { padding: 3px 6px; flex-shrink: 0; }
 .audio-player input:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
 @media (max-width: 900px) { .identity { display: block; }.audio-player { max-width: 440px; margin-top: 18px; } }
 .identity h1 { margin: 0 0 16px; }
@@ -58,6 +71,8 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .display:fullscreen canvas, .display.pseudo-fullscreen canvas { width: 100%; height: 100%; object-fit: contain; }
 .exit-fullscreen { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 1; width: 44px; height: 44px; display: grid; place-items: center; }
 .display canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.intro-video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.display:fullscreen .intro-video, .display.pseudo-fullscreen .intro-video { width: 100%; height: 100%; object-fit: contain; }
 .shader-stage { position: relative; width: 100%; height: 100%; overflow: hidden; }
 .shader-outgoing { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .shader-outgoing[hidden] { display: none; }
@@ -72,6 +87,19 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .transport button { width: 32px; height: 32px; display: grid; place-items: center; }
 .transport svg { width: 16px; height: 16px; }
 .transport button[aria-pressed=true] { color: var(--yellow); border-color: var(--yellow); background: #121100; }
+.intro-placeholder-control, button.intro-placeholder-control:disabled { opacity: 1; border-color: #292929; background: transparent; color: transparent; box-shadow: none; pointer-events: none; }
+.intro-transport > .intro-placeholder-line { width: min(34%, 220px); }
+.intro-transport .intro-placeholder-control { width: 32px; height: 32px; }
+.intro-context-placeholders { margin-top: 28px; }
+.intro-context-placeholders > .intro-placeholder-line { width: 70%; height: 60px; margin-bottom: 20px; }
+.intro-context-placeholders .intro-placeholder-control { width: 68%; height: 28px; }
+.intro-placeholder-line { display: inline-block; height: 10px; border: 1px solid #252525; background: #080808; }
+.intro-control-section .bank-heading { min-height: 27px; align-items: center; }
+.intro-control-section .bank-heading .intro-placeholder-line:first-child { width: 18%; height: 14px; }
+.intro-control-section .bank-heading .intro-placeholder-line:last-child { width: 24%; height: 12px; }
+.intro-keyboard .intro-placeholder-control { cursor: default; }
+.intro-control-section .album .intro-placeholder-line:first-child { width: 15%; }
+.intro-control-section .album .intro-placeholder-line:last-child { width: 34%; height: 18px; }
 .navigation .section-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
 .navigation .section-tiles button { width: 100%; height: auto; aspect-ratio: 1; display: grid; place-items: center; padding: 3px; text-align: center; font-family: "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; font-weight: 900; letter-spacing: 0; text-transform: uppercase; overflow-wrap: anywhere; }
 .section-tiles button[aria-pressed=true] { box-shadow: inset 0 0 0 3px #eee; }

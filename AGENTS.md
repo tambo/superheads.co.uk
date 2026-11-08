@@ -13,10 +13,12 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 ## Identity And Scope
 
 - The primary interface reference is `archive/legacy-site/_export/home`. Retain its home graphics, original historical text, and black/charcoal identity.
+- On a fresh visit, play the user-provided `public/video/suzanna_intro.mp4` muted and inline in Main Display without controls. Keep Section Navigation unselected and hide Context Navigation, Display Transport, and Keyboard Content Bank during the intro. On video end, automatically enter AV LAB/Lab with visual 1 selected. Preserve the MP4; do not replace or re-encode it unless explicitly requested.
 - Use the user-supplied `archive/screenshots/Screenshot 2026-10-30 at 23.50.02.png` as the primary layout reference and the recording in that folder as transition evidence. Do not infer complete layouts from isolated exports. Screenshots are private reference material, not public assets.
 - **Visual fidelity is a requirement, not a suggestion.** Before changing visible UI, inspect the exact supplied screenshot/reference and original home export at the relevant state and viewport. Preserve original artwork, typography, font face, glyph shapes, kerning, proportions, alignment, spacing, colors and composition. Use the exact reviewed asset whenever one exists; do not redraw a logo or replace an image with text/CSS, a substitute font, approximation or generic component styling. Add visual regression checks against the reference where practical. If exact reproduction is not possible with available, approved assets or evidence, do not implement a visual approximation: explain the specific limitation, offer clear options and ask the user which trade-off they approve before changing the design.
 - Preserve the widescreen display, bottom keyboard-shaped content bank and right-hand layered context navigation. Mouse clicks and keyboard controls must dispatch the same selection behavior; context changes reset the bank. Record and test shortcut mappings, native keyboard focus and reduced motion.
 - The top-right navigation has three square buttons spanning the column: AV LAB, Community, Jukebox. AV LAB has Music, Videos, Games, Lab submenus; Community has SoftFood Cafe and Twat Modern; Jukebox has no submenu. Do not show About Us, Contact or Info buttons. Keep historical Portfolio material out of these controls unless the user changes scope.
+- Use the canonical interface vocabulary in the project guide and modernisation skill when discussing controls. In particular, distinguish the top-right Jukebox section tile from the Jukebox Audio Player in the header.
 - Distinguish historical material from present availability. Never fabricate active services, clients, events, playable media, or working legacy integrations.
 - Music-player integration uses Orphism's Tomaz Sounder metadata and existing PHP catalogue/proxy from the browser. No PHP is deployed to Superheads. Staging/production origins passed catalogue CORS and range-access checks after the user's Orphism update; localhost remains blocked. Preserve explicit unavailable states and do not claim fixture-based tests prove production audio playback.
 - The current first prototype is the screenshot-led media console with newly authored AV Lab visual studies. These are not reconstructed original animations. Browser-local favourites, shape filtering, detailed Portfolio case studies and original media migration remain pending until explicitly completed and verified.
@@ -39,6 +41,13 @@ This is the canonical project-wide, always-on guidance for agents working in thi
 - No API routes, Server Actions, SSR, request-time server logic, or runtime PHP, ASP, or SWF. Build-time static rendering is allowed. Use client-side browser APIs only where needed.
 - Recreate interactions with modern accessible HTML, CSS, and TypeScript. Never embed Flash or silently imply unsupported legacy features work.
 - Verify static output, routes, asset references, desktop/mobile layout, keyboard access, and browser-local state. Report untested behavior honestly.
+
+## Local Preview Origin
+
+- Run every local Superheads preview at exactly `http://localhost:3000` (not `127.0.0.1` or another port). The Orphism audio catalogue and streaming service allowlist this origin.
+- Keep dev, static preview, and browser-test configuration on port 3000. Only one preview can use it at a time; check the listener first and stop or terminate an older Superheads preview if needed. Do not stop an unrelated process.
+- Use `npm run dev -- --port 3000` for development. Static serving and Playwright use the same `localhost:3000` origin.
+- **Mandatory cleanup:** when a local preview or test server is no longer needed, stop the process/terminal that started it and verify its port is no longer listening. Before terminating a PID, verify its command and working directory; stop only processes started by the agent. Never kill an unidentified or pre-existing user service.
 
 ## Git And Deployment Boundaries
 

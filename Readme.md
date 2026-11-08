@@ -14,8 +14,10 @@ Requires Node.js 24.22.2 or newer within Node 24. Use your host's native archite
 
 ```bash
 npm ci
-npm run dev -- --port 3100
+npm run dev -- --port 3000
 ```
+
+Use exactly `http://localhost:3000` for local previews; do not substitute `127.0.0.1` or another port. The audio service allowlists this origin. Stop an older Superheads preview occupying port 3000 before starting another.
 
 ## Static Verification
 
@@ -28,7 +30,7 @@ npm run test:e2e
 npm run serve
 ```
 
-Static build output is `out/`; serving it uses port 3100. No Node runtime is needed on the hosting server. Original exported artwork is already curated into public assets; the optional `npm run assets:curate` command requires the local private archive.
+Static build output is `out/`; `npm run serve` serves it at `http://localhost:3000`. Stop the dev server before starting the static preview, and vice versa. No Node runtime is needed on the hosting server. Original exported artwork is already curated into public assets; the optional `npm run assets:curate` command requires the local private archive.
 
 ## Branch Deployments
 
