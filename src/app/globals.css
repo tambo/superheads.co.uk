@@ -13,7 +13,7 @@ button:disabled { cursor: default; opacity: .35; }
 button:hover:not(:disabled) { border-color: var(--yellow); color: var(--yellow); }
 button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
 .console { width: min(1500px, 90%); margin: 56px auto 48px; display: grid; grid-template-columns: minmax(0, 3.45fr) minmax(240px, 1fr); gap: 18px; align-items: start; }
-.identity { align-self: end; padding-bottom: 5px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 40%); gap: 18px; align-items: end; min-width: 0; }
+.identity { align-self: end; padding-bottom: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 40%); gap: 18px; align-items: end; min-width: 0; }
 .identity-copy { min-width: 0; }
 .audio-player { position: relative; z-index: 4; min-width: 0; width: 100%; padding: 10px 12px 8px; background: linear-gradient(#4a4a47, #353535); border: 1px solid #62625e; color: #fff; }
 .audio-player-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
@@ -53,7 +53,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .identity h1 { margin: 0 0 16px; }
 .identity img { display: block; width: 330px; max-width: 90%; height: auto; filter: brightness(0) invert(1); }
 .identity p { color: #777; font-size: 23px; font-weight: 900; margin: 0; }
-.destination { position: relative; border: 1px solid var(--line); padding: 15px; aspect-ratio: 1.47; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 18px; }
+.destination { position: relative; align-self: stretch; height: 100%; aspect-ratio: auto; border: 1px solid var(--line); padding: 15px; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 18px; }
 .ticker-header { display: flex; align-items: center; width: 100%; min-width: 0; min-height: 24px; padding-right: calc(13.875% + 8px); }
 .greeting-ticker { flex: 1; min-width: 0; overflow: hidden; color: var(--grey); font-size: 14px; font-weight: 900; }
 .ticker-track { display: flex; width: max-content; animation: greeting-scroll 22s linear infinite; }

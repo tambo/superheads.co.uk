@@ -386,6 +386,10 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
       const map = await page.locator(".destination").boundingBox();
       expect(player!.x + player!.width).toBeLessThan(map!.x);
       expect(player!.y + player!.height).toBeLessThanOrEqual(map!.y + map!.height + 1);
+      const tagline = await page.locator(".identity-copy p").boundingBox();
+      expect(Math.abs(player!.y + player!.height - (map!.y + map!.height))).toBeLessThanOrEqual(1);
+      expect(Math.abs(tagline!.y + tagline!.height - (map!.y + map!.height))).toBeLessThanOrEqual(1);
+      expect(map!.x - (player!.x + player!.width)).toBeCloseTo(18, 0);
     }
     const sectionRow = await page.locator(".section-tiles").boundingBox();
     const column = await page.locator(".navigation").boundingBox();
