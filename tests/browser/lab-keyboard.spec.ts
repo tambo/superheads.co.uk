@@ -7,6 +7,7 @@ const shaders: { title: string; file: string }[] = parseShaderConfig(JSON.parse(
 test("alphabet keys select every added visual and brackets toggle fullscreen and auto-play", async ({ page }) => {
   await page.route("**/audio/audio-list.php?*", route => route.fulfill({ json: { folder: "tomaz-sounder", files: [] } }));
   await page.goto("/");
+  await page.getByRole("button", { name: "AV LAB", exact: true }).click();
   await expect(page.locator(".pad-25")).toBeEnabled();
   for (const [offset, key] of "klzxcvbnm".split("").entries()) {
     await page.keyboard.press(key);
@@ -37,6 +38,7 @@ test("bracket fullscreen toggle also exits the CSS fallback", async ({ page }) =
     Object.defineProperty(Element.prototype, "webkitRequestFullscreen", { value: undefined, configurable: true });
   });
   await page.goto("/");
+  await page.getByRole("button", { name: "AV LAB", exact: true }).click();
   await expect(page.locator(".pad-25")).toBeEnabled();
   await page.keyboard.press("[");
   await expect(page.locator(".display")).toHaveClass(/pseudo-fullscreen/);
@@ -46,6 +48,7 @@ test("bracket fullscreen toggle also exits the CSS fallback", async ({ page }) =
 
 test("all 26 shader programs render nonblank pixels and respond to audio", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: "AV LAB", exact: true }).click();
   const sources = shaders.map(shader => ({ title: shader.title, source: buildFragmentSource(readFileSync(`public${shader.file}`, "utf8")) }));
   const results = await page.evaluate(entries => {
     const canvas = document.createElement("canvas");

@@ -6,6 +6,7 @@
     "node": ">=20.9.0"
   },
   "scripts": {
+    "videos:sync": "node scripts/sync-youtube.mjs",
     "check:runtime": "node scripts/check-runtime.mjs",
     "preinstall": "npm run check:runtime",
     "predev": "npm run check:runtime",
@@ -21,7 +22,7 @@
     "preassets:curate": "npm run check:runtime",
     "assets:curate": "node scripts/curate-assets.mjs",
     "preserve": "npm run check:runtime",
-    "serve": "serve out -l 3100",
+    "serve": "serve out -l 3000",
     "predeploy:preview": "npm run check:runtime",
     "deploy:preview": "bash scripts/deploy.sh preview",
     "predeploy:apply": "npm run check:runtime",

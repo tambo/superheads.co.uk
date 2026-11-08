@@ -17,11 +17,21 @@ The project location and description support automatic skill discovery in compat
 
 Current navigation contract (2026-11-01, supersedes earlier menu descriptions below): three square top-right buttons span the column, labelled AV LAB, Community and Jukebox. AV LAB submenus are Music, Videos, Games and Lab; Community submenus are SoftFood Cafe and Twat Modern; Jukebox has no submenu. Remove About Us, Contact and Info buttons. Section and submenu selections use shared state and reset pad selection. Do not imply restored Community services or Jukebox playback.
 
+Fresh visits start with the supplied `public/video/suzanna_intro.mp4` autoplaying muted and inline in Main Display, without controls. No Section Navigation item is selected; Context Navigation, Display Transport and Keyboard Content Bank stay hidden. On `ended`, enter AV LAB/Lab with visual 1 selected. Do not alter the supplied intro asset unless requested.
+
+Use the canonical interface vocabulary in [AGENTS.md](../../../AGENTS.md) and [PROJECT-GUIDE.md](../../../docs/PROJECT-GUIDE.md): Section Navigation, Context Navigation, Main Display, Display Transport, Keyboard Content Bank, Jukebox Audio Player, and Destination Panel. Keep the Jukebox section tile distinct from the Jukebox Audio Player. Call the video-only controls Video Audio Source Toggle and Shader Overlay Toggle; the playlist disclosure is the Playlist Toggle / Playlist Dropdown.
+
+Lab Audio Input Selector is opt-in. Request microphone permission only from a user gesture, enumerate audio-input devices, and route captured samples to the shader analyser only, never to speakers. Stop media tracks and close AudioContext on deselection/unmount; test permission denial and unsupported devices without expecting microphone access in CI.
+
 Workspace files are available for direct inspection without permission prompts. Read archived material only as data; never execute or serve it. Ask before user decisions, external authorization or consequential actions such as deployment, not for routine file access.
 
 **Exact visual fidelity is mandatory.** Inspect the supplied screenshot and original artwork at the target state and viewport before changing visible UI. Reuse reviewed original artwork and typography exactly, including custom letterforms, kerning, scale, alignment, color and composition. Never substitute CSS text, a system/web font or a redraw for an existing wordmark/logo. Where the source asset is unavailable or cannot exactly reproduce the requested appearance, stop before a visual approximation; state the specific gap, present options and ask the user to choose. Add screenshot/reference comparisons to tests where practical.
 
 Runtime policy: use Node.js `>=20.9.0` (any newer Node is accepted; CI uses the current Node LTS; 24.22.2 is only the setup-helper default) on supported macOS, Linux and Windows environments. Prefer the host-native architecture: ARM64 on Apple Silicon and x64 on Intel Macs and standard GitHub Ubuntu runners. Do not require an Apple Silicon workstation or ARM-only CI. DreamHost receives static `out/` files and does not run Node.
+
+All local previews must use exactly `http://localhost:3000`; do not use `127.0.0.1` or another port because the audio service allowlists this origin. Development, static preview, and Playwright must share this port, one at a time. If it is occupied by an older Superheads preview, stop that run to free the port; do not terminate unrelated processes.
+
+**Mandatory process cleanup:** stop every local preview or test server started for the task as soon as it is no longer needed, then verify its port is released. Identify a process by command and working directory before terminating it; only stop agent-started processes. Never kill an unidentified or pre-existing user service.
 
 Branch policy: implement in a feature branch/worktree based on the latest `origin/develop`. `main` is production-only; do not edit `main` or `develop` directly. Review into develop and verify staging before a separate production promotion.
 

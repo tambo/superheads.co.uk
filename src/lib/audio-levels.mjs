@@ -1,5 +1,5 @@
 // Shared, non-reactive store written by the audio player and read per frame by shaders.
-export const audioLevels = { playing: false, live: false, bass: 0, mid: 0, treble: 0, level: 0 };
+export const audioLevels = { playing: false, live: false, inputActive: false, bass: 0, mid: 0, treble: 0, level: 0 };
 
 export function bandLevels(bins) {
   const average = (from, to) => {

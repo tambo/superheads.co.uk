@@ -30,6 +30,26 @@ The archive is untrusted: a suspicious obfuscated PHP entry point was discovered
 
 ## Console Controls
 
+Fresh visit: `public/video/suzanna_intro.mp4` autoplays muted and inline in Main Display with no player controls. Section Navigation starts with no selection; Context Navigation, Display Transport and Keyboard Content Bank are hidden. When the four-second intro ends, the interface enters AV LAB/Lab with visual 1 selected. Choosing a section or content before it ends skips the intro.
+
+### Interface Vocabulary
+
+Use these names in task briefs, reviews, tests, and handoffs so people can identify the same control groups:
+
+| Name | Location and contents |
+| --- | --- |
+| Section Navigation | Upper-right square AV LAB, Community, and Jukebox buttons. The Jukebox section tile is navigation, not the audio player. |
+| Context Navigation | Choices for the active section, such as Music, Videos, Games, and Lab. |
+| Main Display | Central widescreen content viewport for text, visual studies, shaders, or videos. |
+| Display Transport | Controls immediately below Main Display: play/pause, restart, fullscreen, and auto-play; Videos also has Video Audio Source Toggle and Shader Overlay Toggle. |
+| Keyboard Content Bank | Bottom QWERTY pad rows used to select the current context's content. Also called the Pad Bank in CSS and tests. |
+| Jukebox Audio Player | Compact Tomaz Sounder player in the header, including the Playlist Toggle, Playlist Dropdown, Now Playing display, seek slider, audio transport, and volume slider. |
+| Destination Panel | Map artwork and greeting ticker. |
+
+When referring to the video-only controls, use **Video Audio Source Toggle** for switching between video sound and Jukebox sound, and **Shader Overlay Toggle** for enabling/disabling the effect. Do not call the Jukebox section tile the player or playlist.
+
+The Lab's **Audio Input Selector** lets a user grant microphone permission and select an audio-input device to drive shader levels. It is off by default and captures only after a user gesture. The MediaStream connects to an `AnalyserNode` without connecting to `AudioContext.destination`, so microphone audio is not played by Superheads. Device labels may be unavailable until permission is granted; denial and unsupported browsers show an explicit status. Deselecting the input or leaving Lab stops all media tracks and closes its AudioContext. Browser tests mock devices and verify the stream is not routed to output; real device permission and microphone signal quality remain browser/device-specific checks.
+
 ### Full Lab Keyboard
 
 Release status (2026-11-04): the user approved the full local preview below, including the 1.2-second crossfade, 26-key layout, bracket shortcuts and revised plasma Body of Light. Application commit `fecdf47` was pushed to develop, deployed and smoke-tested on staging, then promoted to main and deployed with the identical static build. Both previous site trees were backed up and verified; `.well-known/` and `.dh-diag` were preserved. Staging and production serve the matching HTML and all 26 shader files. Real Chromium checks confirmed B selects Body of Light, actual MP3 playback, both bracket toggles, an automatic crossfade and paused audio remaining paused. Production's 11 referenced assets and 404 response passed. All 34 unit tests, 18 browser tests and static build passed before release. This release status supersedes local-only/pending statements in the preview notes below; Safari/Firefox remain unverified.
@@ -98,6 +118,8 @@ The app and gitignore are now implemented. Local Git has no commits or remotes. 
 | Space | Pause/resume an AV Lab study; focused native buttons retain Space activation |
 | Backspace | Restart the visual study |
 | Escape | Return to AV Lab |
+| ' | In Videos, switch between video and Jukebox audio |
+| `\` | In Videos, toggle the shader overlay |
 | Pointer | Click the same controls; move over a study to change its composition |
 
 Empty pads are disabled. Held key repetition, text-entry fields and modifier shortcuts are excluded. System reduced-motion preference freezes automatic animation. Play/pause, restart and fullscreen have labelled icon buttons and tooltips; fullscreen uses the native (or webkit-prefixed) Fullscreen API and, where unavailable (iPhone Safari), a CSS full-viewport fallback with an Exit button and Escape support. The fallback is verified only in emulated Chromium, not on a real iPhone. No sounds, videos, games, account services or external contact availability are fabricated.
@@ -142,3 +164,11 @@ The AV Lab display renders WebGL fragment shaders listed in `public/config/shade
 AV Lab shader playlist now ships 17 newly authored shaders (all pads used, all audio-reactive via iAudio and starting the audio player when selected): Plasma, Tunnel, Pulse Plasma, Lava, Warp, Kaleidoscope, Ripples, Aurora, Metaballs, Interference, Voronoi, Fire, Starfield, Mandala, Waves, Checker Warp and Julia. All compile in headless Chromium (software WebGL).
 
 Fullscreen: the display uses the Fullscreen API where available (hiding navigation UI and requesting landscape orientation lock where supported), otherwise a CSS fixed overlay (iPhone Safari cannot hide its toolbar for non-video content). The shader canvas renders at the displayed size (capped at about 1.6M pixels). Adding the site to the iOS Home Screen or installing it as an app launches it without browser chrome (`manifest.webmanifest`, `appleWebApp`, `viewport-fit=cover`). No app icons have been added.
+
+## AV Lab videos
+
+The Videos section plays YouTube videos with their own audio by default. The display transport can switch to Tomaz Sounder Jukebox audio, which mutes the video and enables the optional WebGL shader overlay. The overlay is off by default and is disabled whenever video audio is selected; browsers cannot expose audio from the cross-origin YouTube iframe for analysis. Videos use the same controls and QWERTY pads as the Lab. The intro and YouTube player fill Main Display width without stretching: height follows the source/player aspect ratio and is centered vertically, so excess height is cropped evenly at top and bottom. Configure it in `public/config/videos.json`: `effects` (shader file in `public/video-effects/`, CSS `blend`, `filter` amounts) and `videos` (11-character YouTube `id`, `title`, optional `effect` and `start`; maximum 26).
+
+The shipped `videos` list is intentionally curated by the user. Preserve manual removals and selections; fewer entries than the channel feed is expected and must not fail validation. Tests should use independent fixtures and validate schema/behavior, never a fixed shipped video ID list or count. Refresh candidates from `channel.handle` with `npm run videos:sync` (uses `YOUTUBE_API_KEY` if set, otherwise the channel RSS feed, which lists about 15 latest videos) or the manually triggered "Sync YouTube videos" workflow. Review candidates before changing the curated list; keep manual titles, effects and start times.
+
+Limits: browsers cannot read pixels from a YouTube iframe, so effects are layered over and filtered on the video rather than warping it. Videos that disallow embedding show a message with a link. No video IDs are shipped until the sync is run.

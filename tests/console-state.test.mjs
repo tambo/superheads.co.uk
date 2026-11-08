@@ -44,6 +44,8 @@ test("pause, reset and escape are reversible without changing content", () => {
   assert.equal(consoleReducer(initialState, { type: "slot", slot: -1 }), initialState);
   assert.deepEqual(keyboardAction("["), { type: "fullscreen" });
   assert.deepEqual(keyboardAction("]"), { type: "auto-visuals" });
+  assert.deepEqual(keyboardAction("'"), { type: "video-audio" });
+  assert.deepEqual(keyboardAction("\\"), { type: "video-overlay" });
 });
 
 test("Music pads, keyboard selection and player transport share catalogue selection", () => {
