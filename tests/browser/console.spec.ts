@@ -110,6 +110,85 @@ test("audio player dropdown lists, scrolls and selects available tracks", async 
   await expect(page.getByRole("button", { name: "Show playlist" })).toHaveAttribute("aria-expanded", "false");
 });
 
+test("Lab audio input drives analyser only and can be stopped", async ({ page }) => {
+  await page.addInitScript(() => {
+    const stats = { constraints: null as MediaStreamConstraints | null, analyserConnected: false, connectedToOutput: false, trackStops: 0 };
+    const track = { stop() { stats.trackStops += 1; }, addEventListener() {} };
+    const stream = { active: true, getTracks: () => [track], getAudioTracks: () => [track] };
+    class FakeAudioContext {
+      destination = {};
+      state = "running";
+      createAnalyser() {
+        return { fftSize: 0, frequencyBinCount: 128, smoothingTimeConstant: 0, getByteFrequencyData(values: Uint8Array) { values.fill(96); } };
+      }
+      createMediaStreamSource() {
+        return { connect: (destination: unknown) => {
+          stats.analyserConnected = true;
+          stats.connectedToOutput = destination === this.destination;
+        } };
+      }
+      resume() { return Promise.resolve(); }
+      close() { return Promise.resolve(); }
+    }
+    const devices = [
+      { kind: "audioinput", deviceId: "mic-built-in", label: "Built-in Microphone", groupId: "group-1" },
+      { kind: "audioinput", deviceId: "mic-usb", label: "USB Microphone", groupId: "group-2" },
+    ];
+    const mediaDevices = {
+      enumerateDevices: async () => devices,
+      getUserMedia: async (constraints: MediaStreamConstraints) => { stats.constraints = constraints; return stream; },
+      addEventListener() {},
+      removeEventListener() {},
+    };
+    Object.assign(window, { __audioInputStats: stats });
+    Object.defineProperty(window, "AudioContext", { value: FakeAudioContext, configurable: true });
+    Object.defineProperty(navigator, "mediaDevices", { value: mediaDevices, configurable: true });
+  });
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "AV LAB", exact: true }).click();
+  const audioToggle = page.locator(".audio-play");
+  if (await audioToggle.getAttribute("aria-label") === "Play audio") await audioToggle.click();
+  await expect.poll(() => page.locator("audio").evaluate(audio => (audio as HTMLAudioElement).paused)).toBe(false);
+  const selector = page.getByRole("button", { name: "Select audio input" });
+  await selector.click();
+  const menu = page.getByRole("group", { name: "Audio input devices" });
+  await expect(menu.getByText("Input drives visuals only; audio is not played here.")).toBeVisible();
+  await menu.getByRole("button", { name: "USB Microphone" }).click();
+  await expect(page.getByRole("button", { name: "Audio input: USB Microphone" })).toHaveAttribute("aria-pressed", "true");
+  await expect(audioToggle).toBeEnabled();
+  await expect(audioToggle).toHaveAttribute("aria-label", "Pause audio");
+  await expect.poll(() => page.locator("audio").evaluate(audio => (audio as HTMLAudioElement).paused)).toBe(false);
+  await page.getByRole("button", { name: "Audio input: USB Microphone" }).click();
+  const selectedInput = page.getByRole("group", { name: "Audio input devices" }).getByRole("button", { name: "USB Microphone" });
+  const optionLayout = await selectedInput.evaluate(option => {
+    const label = option.querySelector(".audio-input-name")!.getBoundingClientRect();
+    const check = option.querySelector(".audio-input-check")!.getBoundingClientRect();
+    return { display: getComputedStyle(option).display, labelRight: label.right, checkLeft: check.left, optionWidth: option.getBoundingClientRect().width };
+  });
+  expect(optionLayout.display).toBe("flex");
+  expect(optionLayout.labelRight).toBeLessThan(optionLayout.checkLeft);
+  expect(optionLayout.optionWidth).toBeGreaterThan(32);
+  await page.getByRole("button", { name: "Audio input: USB Microphone" }).click();
+
+  const stats = await page.evaluate(() => (window as unknown as Window & { __audioInputStats: { constraints: MediaStreamConstraints | null; analyserConnected: boolean; connectedToOutput: boolean } }).__audioInputStats);
+  expect((stats.constraints?.audio as MediaTrackConstraints).deviceId).toEqual({ exact: "mic-usb" });
+  expect(stats.analyserConnected).toBe(true);
+  expect(stats.connectedToOutput).toBe(false);
+
+  await page.getByRole("button", { name: "Audio input: USB Microphone" }).click();
+  await menu.getByRole("button", { name: "None Stop input" }).click();
+  await expect(page.getByRole("button", { name: "Select audio input" })).toHaveAttribute("aria-pressed", "false");
+  const stoppedTracks = await page.evaluate(() => (window as unknown as Window & { __audioInputStats: { trackStops: number } }).__audioInputStats.trackStops);
+  expect(stoppedTracks).toBeGreaterThan(0);
+
+  await page.getByRole("button", { name: "Select audio input" }).click();
+  await page.getByRole("group", { name: "Audio input devices" }).getByRole("button", { name: "USB Microphone" }).click();
+  await page.getByRole("button", { name: "MUSIC", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Select audio input" })).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => (window as unknown as Window & { __audioInputStats: { trackStops: number } }).__audioInputStats.trackStops)).toBeGreaterThan(stoppedTracks);
+});
+
 test("visual auto-play changes randomly after 5-10 seconds and respects pause, off and context", async ({ page }) => {
   await page.goto("/");
   await enterLab(page);

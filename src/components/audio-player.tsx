@@ -27,7 +27,7 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
   useEffect(() => {
     const audio = audioRef.current;
     analyser.current = null;
-    audioLevels.live = false;
+    if (!audioLevels.inputActive) audioLevels.live = false;
     if (!audio || corsMode !== "anonymous") return;
     const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AudioContextClass) return;
@@ -54,14 +54,17 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
   }, [corsMode]);
 
   useEffect(() => {
-    audioLevels.playing = playing;
-    if (!playing) { audioLevels.live = false; audioLevels.bass = audioLevels.mid = audioLevels.treble = audioLevels.level = 0; return; }
+    if (!audioLevels.inputActive) audioLevels.playing = playing;
+    if (!playing) {
+      if (!audioLevels.inputActive) { audioLevels.live = false; audioLevels.bass = audioLevels.mid = audioLevels.treble = audioLevels.level = 0; }
+      return;
+    }
     const bins = new Uint8Array(128);
     let frame = 0;
     let levels = { bass: 0, mid: 0, treble: 0, level: 0 };
     const sample = () => {
       const node = analyser.current;
-      if (node) {
+      if (node && !audioLevels.inputActive) {
         node.getByteFrequencyData(bins);
         levels = smoothLevels(levels, bandLevels(bins));
         Object.assign(audioLevels, levels, { live: true });
@@ -69,8 +72,12 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
       frame = requestAnimationFrame(sample);
     };
     frame = requestAnimationFrame(sample);
-    return () => { cancelAnimationFrame(frame); audioLevels.live = false; };
+    return () => { cancelAnimationFrame(frame); if (!audioLevels.inputActive) audioLevels.live = false; };
   }, [playing]);
+
+  useEffect(() => {
+    if (!audioLevels.inputActive) audioLevels.playing = playing;
+  }, [playing, suspended]);
 
   useEffect(() => {
     const audio = audioRef.current;

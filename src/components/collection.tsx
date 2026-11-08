@@ -4,6 +4,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { ArrowDownRight, Maximize, Minimize, Music2, Pause, Play, RotateCcw, Shuffle, Sparkles, Volume2 } from "lucide-react";
 import { contexts, sections, initialState, consoleReducer, keyboardAction, padKeys, randomVisualStep } from "../lib/console-state.mjs";
 import AudioPlayer, { type AudioTrack } from "./audio-player";
+import AudioInputSelector from "./audio-input-selector";
 import ShaderVisual, { type ShaderEntry } from "./shader-visual";
 import VideoVisual, { type VideoEntry } from "./video-visual";
 import { videoConfigUrl, parseVideoConfig } from "../lib/video-config.mjs";
@@ -80,6 +81,7 @@ export default function Collection() {
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const [videoAudioSource, setVideoAudioSource] = useState<"video" | "jukebox">("video");
   const [videoShaderEnabled, setVideoShaderEnabled] = useState(false);
+  const [audioInputActive, setAudioInputActive] = useState(false);
   const [catalogueLoading, setCatalogueLoading] = useState(true);
   const [catalogueError, setCatalogueError] = useState("");
   const [catalogueAttempt, setCatalogueAttempt] = useState(0);
@@ -250,6 +252,7 @@ export default function Collection() {
           <button aria-label="Restart visual" aria-keyshortcuts="Backspace" title="Restart - Backspace" disabled={!visualContext || (state.context === "videos" && !videos.length)} onClick={() => dispatch({ type: "reset" })}><RotateCcw /></button>
           <button ref={fullscreenButtonRef} aria-label="Fullscreen display" aria-keyshortcuts="[" title="Toggle fullscreen - [" onClick={enterFullscreen}><Maximize /></button>
           <button aria-label="Auto-play visuals" aria-keyshortcuts="]" aria-pressed={state.autoVisuals} title="Auto-play visuals - ] - random change every 5-10 seconds" disabled={!visualContext || visualCount < 2} onClick={() => dispatch({ type: "auto-visuals" })}><Shuffle /></button>
+          {state.context === "lab" && <AudioInputSelector onActiveChange={setAudioInputActive} />}
           {state.context === "videos" && videos.length > 0 && <>
             <button ref={videoAudioButtonRef} aria-label={videoAudioSource === "video" ? "Audio source: video" : "Audio source: Jukebox"} aria-keyshortcuts={"'"} aria-pressed={videoUsesJukebox} title={`Audio source: ${videoAudioSource} - toggle with '`} onClick={() => {
               const nextSource = videoAudioSource === "video" ? "jukebox" : "video";
