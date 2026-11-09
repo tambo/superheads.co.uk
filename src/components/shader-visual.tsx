@@ -16,7 +16,10 @@ export default function ShaderVisual({ shader, paused, revision, crossfade = fal
   const pointer = useRef({ x: 0.5, y: 0.5 });
   const timeline = useRef({ key: "", elapsed: 0 });
   const pausedRef = useRef(paused);
-  const [source, setSource] = useState("");
+  const [loaded, setLoaded] = useState({ key: "", text: "" });
+  const shaderKey = shader.file || shader.source || "";
+  // Source belonging to a previous shader is ignored so it is never drawn with the new shader's settings.
+  const source = loaded.key === shaderKey ? loaded.text : "";
   const [error, setError] = useState("");
   pausedRef.current = paused;
 
@@ -36,13 +39,12 @@ export default function ShaderVisual({ shader, paused, revision, crossfade = fal
         outgoing.hidden = false;
       }
     }
-    setSource("");
     setError("");
-    if (shader.source) { setSource(shader.source); return; }
+    if (shader.source) { setLoaded({ key: shaderKey, text: shader.source }); return; }
     const controller = new AbortController();
     fetch(shader.file!, { signal: controller.signal, cache: "no-cache" }).then(async response => {
       if (!response.ok) throw new Error("missing");
-      setSource(await response.text());
+      setLoaded({ key: shaderKey, text: await response.text() });
     }).catch(() => { if (!controller.signal.aborted) setError("Shader file unavailable."); });
     return () => controller.abort();
   }, [shader.file, shader.source]);
