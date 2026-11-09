@@ -4,8 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  actions: write
+  contents: read
 
 jobs:
   sync:
@@ -20,14 +19,7 @@ jobs:
       - run: node scripts/sync-youtube.mjs
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-      - name: Commit and deploy to staging
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if git diff --quiet public/config/videos.json; then echo "No changes"; exit 0; fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/config/videos.json
-          git commit -m "Sync YouTube videos"
-          git push origin develop
-          gh workflow run deploy-dreamhost.yml --ref develop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: youtube-candidates
+          path: youtube-candidates.json

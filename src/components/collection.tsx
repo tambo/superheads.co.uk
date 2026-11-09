@@ -92,7 +92,7 @@ export default function Collection() {
   const videoAudioButtonRef = useRef<HTMLButtonElement>(null);
   const videoOverlayButtonRef = useRef<HTMLButtonElement>(null);
   const context = contexts.find(item => item.id === state.context)!;
-  const items = state.context === "music" ? state.musicTracks.map((track: AudioTrack) => track.title) : state.context === "lab" && shaders.length ? shaders.map(shader => shader.title) : state.context === "videos" && videos.length ? videos.map(video => video.title) : context.items;
+  const items = state.context === "music" ? state.musicTracks.map((track: AudioTrack) => track.title) : state.context === "lab" && shaders.length ? shaders.map(shader => shader.title) : state.context === "videos" ? videos.map(video => video.title) : context.items;
   const visualContext = state.context === "lab" || state.context === "videos";
   const visualCount = state.context === "videos" ? videos.length : shaders.length;
   const videoUsesJukebox = state.context === "videos" && videoAudioSource === "jukebox";

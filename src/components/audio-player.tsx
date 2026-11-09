@@ -21,6 +21,8 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
   const [playbackError, setPlaybackError] = useState("");
   const [corsMode, setCorsMode] = useState<"anonymous" | undefined>("anonymous");
   const analyser = useRef<AnalyserNode | null>(null);
+  const suspendedRef = useRef(suspended);
+  suspendedRef.current = suspended;
   const track = tracks[index];
 
   // Analysis needs a CORS-enabled stream. If the host rejects CORS the element is retried without it and the visuals use a simulated pulse.
@@ -54,7 +56,7 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
   }, [corsMode]);
 
   useEffect(() => {
-    if (!audioLevels.inputActive) audioLevels.playing = playing;
+    audioLevels.playing = playing;
     if (!playing) {
       if (!audioLevels.inputActive) { audioLevels.live = false; audioLevels.bass = audioLevels.mid = audioLevels.treble = audioLevels.level = 0; }
       return;
@@ -76,10 +78,6 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
   }, [playing]);
 
   useEffect(() => {
-    if (!audioLevels.inputActive) audioLevels.playing = playing;
-  }, [playing, suspended]);
-
-  useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     let cancelled = false;
@@ -87,12 +85,16 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
     setDuration(0);
     setPlaybackError("");
     audio.load();
-    if (track && revision > 0 && !suspended) audio.play().catch(error => {
+    if (track && revision > 0 && !suspendedRef.current) audio.play().catch(error => {
       if (!cancelled && error.name !== "AbortError") setPlaybackError("Playback unavailable. Press play to retry.");
     });
-    else if (suspended) audio.pause();
+    else audio.pause();
     return () => { cancelled = true; };
-  }, [track?.source, revision, corsMode, suspended]);
+  }, [track?.source, revision, corsMode]);
+
+  useEffect(() => {
+    if (suspended) audioRef.current?.pause();
+  }, [suspended]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -111,7 +113,10 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
     <header className="audio-player-heading">
       <img src="/artwork/home/4.svg" width="145" height="27" alt="superheads" />
       <button ref={playlistToggleRef} className="audio-playlist-toggle" type="button" aria-label={playlistOpen ? "Hide playlist" : "Show playlist"} aria-expanded={playlistOpen} aria-controls="audio-playlist" title={playlistOpen ? "Hide playlist" : "Show playlist"} disabled={!tracks.length} onClick={() => setPlaylistOpen(open => !open)} onKeyDown={event => {
-        if (event.key === "Escape" && playlistOpen) setPlaylistOpen(false);
+        if (event.key === "Escape" && playlistOpen) {
+          event.stopPropagation();
+          setPlaylistOpen(false);
+        }
       }}>
         <ListMusic aria-hidden="true" /><ChevronDown aria-hidden="true" />
       </button>
@@ -119,6 +124,7 @@ export default function AudioPlayer({ tracks, index, revision, loading, error, s
     {playlistOpen && <nav id="audio-playlist" className="audio-playlist" aria-label="Available audio tracks" onKeyDown={event => {
       if (event.key === "Escape") {
         event.preventDefault();
+        event.stopPropagation();
         setPlaylistOpen(false);
         playlistToggleRef.current?.focus();
       }

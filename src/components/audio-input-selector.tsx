@@ -22,6 +22,7 @@ export default function AudioInputSelector({ onActiveChange }: AudioInputSelecto
   const streamRef = useRef<MediaStream | null>(null);
   const contextRef = useRef<AudioContext | null>(null);
   const frameRef = useRef(0);
+  const requestRef = useRef(0);
 
   const enumerateDevices = async () => {
     const mediaDevices = navigator.mediaDevices;
@@ -43,6 +44,7 @@ export default function AudioInputSelector({ onActiveChange }: AudioInputSelecto
   };
 
   const stopCapture = (notify = true) => {
+    requestRef.current += 1;
     cancelAnimationFrame(frameRef.current);
     frameRef.current = 0;
     streamRef.current?.getTracks().forEach(track => track.stop());
@@ -65,6 +67,7 @@ export default function AudioInputSelector({ onActiveChange }: AudioInputSelecto
   }, [open]);
 
   useEffect(() => () => {
+    requestRef.current += 1;
     cancelAnimationFrame(frameRef.current);
     streamRef.current?.getTracks().forEach(track => track.stop());
     contextRef.current?.close().catch(() => {});
@@ -86,6 +89,7 @@ export default function AudioInputSelector({ onActiveChange }: AudioInputSelecto
 
   const selectDevice = async (device: AudioInputDevice) => {
     setError("");
+    const request = ++requestRef.current;
     let stream: MediaStream | null = null;
     let context: AudioContext | null = null;
     try {
@@ -96,6 +100,10 @@ export default function AudioInputSelector({ onActiveChange }: AudioInputSelecto
       };
       if (device.deviceId) audio.deviceId = { exact: device.deviceId };
       stream = await navigator.mediaDevices.getUserMedia({ audio, video: false });
+      if (request !== requestRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       const AudioContextClass = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AudioContextClass) throw new Error("Web Audio API unavailable");
       context = new AudioContextClass();
@@ -104,8 +112,14 @@ export default function AudioInputSelector({ onActiveChange }: AudioInputSelecto
       analyser.smoothingTimeConstant = 0.6;
       context.createMediaStreamSource(stream).connect(analyser);
       await context.resume();
+      if (request !== requestRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        context.close().catch(() => {});
+        return;
+      }
 
       stopCapture(false);
+      requestRef.current = request;
       streamRef.current = stream;
       contextRef.current = context;
       setSelectedDevice(device.deviceId);
@@ -129,6 +143,7 @@ export default function AudioInputSelector({ onActiveChange }: AudioInputSelecto
     } catch {
       stream?.getTracks().forEach(track => track.stop());
       context?.close().catch(() => {});
+      if (request !== requestRef.current) return;
       setError("Could not start this audio input. Check microphone permission and try again.");
     }
   };
@@ -148,7 +163,7 @@ export default function AudioInputSelector({ onActiveChange }: AudioInputSelecto
         <span>None</span>
         <span className="audio-input-state">Stop input</span>
       </button>}
-      {devices.map((device, index) => <button key={device.deviceId || `input-${index}`} className="audio-input-option" type="button" aria-pressed={device.deviceId === selectedDevice} onClick={() => void selectDevice(device)}>
+      {devices.map((device, index) => <button key={device.deviceId || `input-${index}`} className="audio-input-option" type="button" disabled={!device.deviceId} aria-pressed={device.deviceId === selectedDevice} onClick={() => void selectDevice(device)}>
         <span className="audio-input-name">{device.label}</span>
         {device.deviceId === selectedDevice && <Check className="audio-input-check" aria-label="Selected" />}
       </button>)}
