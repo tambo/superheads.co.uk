@@ -30,7 +30,7 @@ The archive is untrusted: a suspicious obfuscated PHP entry point was discovered
 
 ## Console Controls
 
-Fresh visit: `public/video/suzanna_intro.mp4` autoplays muted and inline in Main Display with no player controls. Section Navigation starts with no selection; Context Navigation, Display Transport and Keyboard Content Bank are hidden. When the four-second intro ends, the interface enters AV LAB/Lab with visual 1 selected. Choosing a section or content before it ends skips the intro.
+Fresh visit: the interface opens directly in AV LAB/Lab with visual 1 selected. The former intro video (`suzanna_intro.mp4`) was removed because it loaded slowly.
 
 ### Interface Vocabulary
 

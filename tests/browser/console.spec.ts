@@ -26,31 +26,9 @@ async function enterLab(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: "AV LAB", exact: true }).click();
 }
 
-test("first visit plays a control-free intro then opens AV LAB with visual one selected", async ({ page }) => {
+test("first visit opens AV LAB with visual one selected and no intro video", async ({ page }) => {
   await page.goto("/");
-  const intro = page.getByLabel("Superheads introduction");
-  await expect(intro).toHaveAttribute("src", "/video/suzanna_intro.mp4");
-  await expect(intro).toHaveAttribute("autoplay", "");
-  await expect(intro).toHaveAttribute("muted", "");
-  await expect(intro).toHaveAttribute("playsinline", "");
-  expect(await intro.evaluate(video => (video as HTMLVideoElement).controls)).toBe(false);
-  await expect(page.locator(".section-tiles button[aria-pressed=true]")).toHaveCount(0);
-  await expect(page.getByRole("navigation", { name: "Context Navigation" })).toHaveCount(0);
-  await expect(page.getByRole("region", { name: "Content controls" })).toHaveCount(0);
-  await expect(page.locator(".intro-context-placeholders .intro-placeholder-control")).toHaveCount(4);
-  await expect(page.locator(".intro-transport .intro-placeholder-control")).toHaveCount(4);
-  await expect(page.locator(".intro-keyboard .intro-placeholder-control")).toHaveCount(26);
-  await expect(page.locator(".intro-placeholder-control:not([disabled])")).toHaveCount(0);
-  await expect(page.locator(".intro-control-section")).toHaveAttribute("aria-hidden", "true");
-  for (const width of [1440, 390, 320]) {
-    await page.setViewportSize({ width, height: 900 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await expect(page.locator(".intro-keyboard .intro-placeholder-control")).toHaveCount(26);
-  }
-
-  await intro.evaluate(video => video.dispatchEvent(new Event("ended")));
-  await expect(intro).toHaveCount(0);
-  await expect(page.locator(".intro-placeholder-control")).toHaveCount(0);
+  await expect(page.getByLabel("Superheads introduction")).toHaveCount(0);
   await expect(page.locator(".section-tiles button[aria-pressed=true]")).toHaveText("AV LAB");
   await expect(page.getByRole("navigation", { name: "Context Navigation" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Content controls" })).toBeVisible();
@@ -371,9 +349,6 @@ test("three sections switch their submenus and retain shared keyboard and pointe
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.goto("/");
-  await expect(page.getByLabel("Superheads introduction")).toHaveAttribute("src", "/video/suzanna_intro.mp4");
-  await expect(page.locator(".section-tiles button[aria-pressed=true]")).toHaveCount(0);
-  await expect(page.locator(".pad[aria-pressed=true]")).toHaveCount(0);
   await enterLab(page);
   await expect(page.locator(".context-tiles button")).toHaveCount(4);
   await expect(page.locator(".pad")).toHaveCount(26);
@@ -608,34 +583,13 @@ test("Videos section defaults to video audio, keeps shader off, and supports QWE
   expect(await page.locator(".transport").evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
 });
 
-test("intro and YouTube videos preserve proportions and fit centered in the display", async ({ page }) => {
+test("YouTube videos preserve proportions and fit centered in the display", async ({ page }) => {
   await page.route(/youtube(-nocookie)?\.com/, route => route.abort());
   await page.route("**/config/videos.json", route => route.fulfill({ json: {
     effects: [{ name: "Beat Rings", file: "/video-effects/beat-rings.frag", blend: "screen" }],
     videos: [{ id: "aaaaaaaaaaa", title: "First" }],
   } }));
   await page.goto("/");
-  const intro = page.getByLabel("Superheads introduction");
-  await expect.poll(() => intro.evaluate(video => (video as HTMLVideoElement).videoWidth)).toBe(2808);
-  await expect.poll(() => intro.evaluate(video => (video as HTMLVideoElement).videoHeight)).toBe(1416);
-
-  for (const width of [1440, 390, 320]) {
-    await page.setViewportSize({ width, height: 900 });
-    const introGeometry = await page.evaluate(() => {
-      const displayElement = document.querySelector(".display")!;
-      const displayRect = displayElement.getBoundingClientRect();
-      const videoRect = document.querySelector(".intro-video")!.getBoundingClientRect();
-      return {
-        displayWidth: displayElement.clientWidth,
-        displayCenterY: displayRect.top + displayRect.height / 2,
-        video: { left: videoRect.left, top: videoRect.top, width: videoRect.width, height: videoRect.height },
-      };
-    });
-    expect(Math.abs(introGeometry.video.width - introGeometry.displayWidth)).toBeLessThan(1);
-    expect(introGeometry.video.width / introGeometry.video.height).toBeCloseTo(2808 / 1416, 2);
-    expect(introGeometry.video.top + introGeometry.video.height / 2).toBeCloseTo(introGeometry.displayCenterY, 0);
-  }
-
   await enterLab(page);
   await page.getByRole("button", { name: "VIDEOS", exact: true }).click();
   for (const width of [1440, 390, 320]) {

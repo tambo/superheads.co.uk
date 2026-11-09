@@ -17,7 +17,7 @@ The project location and description support automatic skill discovery in compat
 
 Current navigation contract (2026-11-01, supersedes earlier menu descriptions below): three square top-right buttons span the column, labelled AV LAB, Community and Jukebox. AV LAB submenus are Music, Videos, Games and Lab; Community submenus are SoftFood Cafe and Twat Modern; Jukebox has no submenu. Remove About Us, Contact and Info buttons. Section and submenu selections use shared state and reset pad selection. Do not imply restored Community services or Jukebox playback.
 
-Fresh visits start with the supplied `public/video/suzanna_intro.mp4` autoplaying muted and inline in Main Display, without controls. No Section Navigation item is selected; Context Navigation, Display Transport and Keyboard Content Bank stay hidden. On `ended`, enter AV LAB/Lab with visual 1 selected. Do not alter the supplied intro asset unless requested.
+Fresh visits open directly in AV LAB/Lab with visual 1 selected. There is no intro video; it was removed at the user's request because it loaded slowly.
 
 Use the canonical interface vocabulary in [AGENTS.md](../../../AGENTS.md) and [PROJECT-GUIDE.md](../../../docs/PROJECT-GUIDE.md): Section Navigation, Context Navigation, Main Display, Display Transport, Keyboard Content Bank, Jukebox Audio Player, and Destination Panel. Keep the Jukebox section tile distinct from the Jukebox Audio Player. Call the video-only controls Video Audio Source Toggle and Shader Overlay Toggle; the playlist disclosure is the Playlist Toggle / Playlist Dropdown.
 

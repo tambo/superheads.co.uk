@@ -71,7 +71,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .display:fullscreen canvas, .display.pseudo-fullscreen canvas { width: 100%; height: 100%; object-fit: contain; }
 .exit-fullscreen { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 1; width: 44px; height: 44px; display: grid; place-items: center; }
 .display canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; }
-.intro-video { position: absolute; left: 0; top: 50%; display: block; width: 100%; height: auto; transform: translateY(-50%); background: #000; }
 .shader-stage { position: relative; width: 100%; height: 100%; overflow: hidden; }
 .shader-outgoing { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .shader-outgoing[hidden] { display: none; }
@@ -86,19 +85,6 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outlin
 .transport button { width: 32px; height: 32px; display: grid; place-items: center; }
 .transport svg { width: 16px; height: 16px; }
 .transport button[aria-pressed=true] { color: var(--yellow); border-color: var(--yellow); background: #121100; }
-.intro-placeholder-control, button.intro-placeholder-control:disabled { opacity: 1; border-color: #292929; background: transparent; color: transparent; box-shadow: none; pointer-events: none; }
-.intro-transport > .intro-placeholder-line { width: min(34%, 220px); }
-.intro-transport .intro-placeholder-control { width: 32px; height: 32px; }
-.intro-context-placeholders { margin-top: 28px; }
-.intro-context-placeholders > .intro-placeholder-line { width: 70%; height: 60px; margin-bottom: 20px; }
-.intro-context-placeholders .intro-placeholder-control { width: 68%; height: 28px; }
-.intro-placeholder-line { display: inline-block; height: 10px; border: 1px solid #252525; background: #080808; }
-.intro-control-section .bank-heading { min-height: 27px; align-items: center; }
-.intro-control-section .bank-heading .intro-placeholder-line:first-child { width: 18%; height: 14px; }
-.intro-control-section .bank-heading .intro-placeholder-line:last-child { width: 24%; height: 12px; }
-.intro-keyboard .intro-placeholder-control { cursor: default; }
-.intro-control-section .album .intro-placeholder-line:first-child { width: 15%; }
-.intro-control-section .album .intro-placeholder-line:last-child { width: 34%; height: 18px; }
 .navigation .section-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
 .navigation .section-tiles button { width: 100%; height: auto; aspect-ratio: 1; display: grid; place-items: center; padding: 3px; text-align: center; font-family: "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; font-weight: 900; letter-spacing: 0; text-transform: uppercase; overflow-wrap: anywhere; }
 .section-tiles button[aria-pressed=true] { box-shadow: inset 0 0 0 3px #eee; }
