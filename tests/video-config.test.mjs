@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { parseVideoConfig, videoFilterStyle, buildOverlaySource } from "../src/lib/video-config.mjs";
-import { parseFeed, mergeVideos } from "../src/lib/youtube-feed.mjs";
+import { parseFeed, findCandidates } from "../src/lib/youtube-feed.mjs";
 
 const effects = [{ name: "A", file: "/video-effects/a.frag" }, { name: "B", file: "/video-effects/b.frag", blend: "difference" }];
 
@@ -27,11 +27,11 @@ test("overlay source declares audio uniforms", () => {
   assert.match(buildOverlaySource("void mainImage(out vec4 c, in vec2 f){ c = vec4(0.); }"), /iAudio/);
 });
 
-test("feed parsing and merge keep manual fields", () => {
+test("feed parsing yields only uncurated candidates", () => {
   const xml = "<feed><entry><yt:videoId>abcdefghijk</yt:videoId><title>Hello</title></entry></feed>";
   const fetched = parseFeed(xml);
   assert.equal(fetched[0].id, "abcdefghijk");
-  const merged = mergeVideos([{ id: "abcdefghijk", title: "Custom", effect: "B" }], fetched);
-  assert.equal(merged[0].title, "Custom");
-  assert.equal(merged[0].effect, "B");
+  const curated = [{ id: "abcdefghijk", title: "Custom", effect: "B" }];
+  assert.deepEqual(findCandidates(curated, fetched), []);
+  assert.deepEqual(findCandidates([], [...fetched, ...fetched]), fetched);
 });

@@ -23,8 +23,9 @@ export function parseFeed(xml) {
   })).filter(video => video.id);
 }
 
-// Refreshes the list while keeping hand-edited fields (effect, start, custom titles) for videos that remain.
-export function mergeVideos(existing, fetched, limit = 26) {
-  const known = new Map((existing || []).map(video => [video.id, video]));
-  return fetched.slice(0, limit).map(video => ({ ...video, ...(known.get(video.id) || {}) }));
+// The curated list is never rewritten; fetched videos that are not already curated are returned for manual review.
+export function findCandidates(existing, fetched) {
+  const known = new Set((existing || []).map(video => video.id));
+  const seen = new Set();
+  return fetched.filter(video => !known.has(video.id) && !seen.has(video.id) && seen.add(video.id));
 }

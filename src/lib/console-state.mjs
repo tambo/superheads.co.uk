@@ -45,7 +45,7 @@ export function consoleReducer(state, action) {
   }
   if (action.type === "manual-audio-source") return { ...state, automaticVisual: false };
   const context = contexts.find(context => context.id === state.context);
-  const itemCount = state.context === "music" ? state.musicTracks.length : state.context === "lab" && state.labCount !== null ? state.labCount : state.context === "videos" && state.videoCount ? state.videoCount : context.items.length;
+  const itemCount = state.context === "music" ? state.musicTracks.length : state.context === "lab" && state.labCount !== null ? state.labCount : state.context === "videos" ? state.videoCount ?? 0 : context.items.length;
   if (action.type === "slot" && Number.isInteger(action.slot) && action.slot >= 0 && action.slot < itemCount) {
     return state.context === "music" ? { ...state, slot: action.slot, audioIndex: action.slot, audioRevision: state.audioRevision + 1 } : { ...state, slot: action.slot, paused: false, automaticVisual: action.automatic === true, manualVisualRevision: state.manualVisualRevision + ((state.context === "lab" || state.context === "videos") && !action.automatic ? 1 : 0) };
   }

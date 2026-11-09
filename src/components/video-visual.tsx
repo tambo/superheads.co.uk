@@ -31,7 +31,7 @@ function loadYouTubeApi(): Promise<YouTubeApi> {
         settled = true;
         window.clearTimeout(timer);
         if (api?.Player) resolve(api);
-        else { apiPromise = null; reject(new Error("YouTube unavailable")); }
+        else { apiPromise = null; script.remove(); reject(new Error("YouTube unavailable")); }
       };
       const timer = window.setTimeout(() => finish(), apiLoadTimeout);
       const previousReady = host.onYouTubeIframeAPIReady;
@@ -39,7 +39,7 @@ function loadYouTubeApi(): Promise<YouTubeApi> {
         try { previousReady?.(); } finally { finish(host.YT); }
       };
       const script = document.querySelector<HTMLScriptElement>('script[src="https://www.youtube.com/iframe_api"]') || document.createElement("script");
-      if (!script.src) {
+      if (!script.isConnected) {
         script.src = "https://www.youtube.com/iframe_api";
         document.head.append(script);
       }
@@ -217,6 +217,7 @@ export default function VideoVisual({ video, paused, revision, muted, overlayEna
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     let handle = 0;
     const apply = (timestamp: number) => {
+      if (pausedRef.current) { handle = requestAnimationFrame(apply); return; }
       const levels = reduced.matches ? { bass: 0, mid: 0, treble: 0, level: 0 } : audioLevels.live ? audioLevels : audioLevels.playing ? simulatedLevels(timestamp / 1000) : { bass: 0, mid: 0, treble: 0, level: 0 };
       const style = videoFilterStyle(levels, video.effect.filter);
       frame.style.filter = style.filter;
@@ -284,7 +285,7 @@ export default function VideoVisual({ video, paused, revision, muted, overlayEna
       gl.uniform3f(resolution, canvas.width, canvas.height, 1);
       gl.uniform1f(time, timeline.current.elapsed);
       gl.uniform4f(mouse, pointer.current.x * canvas.width, (1 - pointer.current.y) * canvas.height, 0, 0);
-      const levels = audioLevels.live ? audioLevels : audioLevels.playing ? simulatedLevels(timestamp / 1000) : null;
+      const levels = reduced.matches ? null : audioLevels.live ? audioLevels : audioLevels.playing ? simulatedLevels(timestamp / 1000) : null;
       gl.uniform4f(audio, levels?.bass ?? 0, levels?.mid ?? 0, levels?.treble ?? 0, levels?.level ?? 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       handle = requestAnimationFrame(draw);

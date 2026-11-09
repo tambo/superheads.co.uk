@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { extractChannelId, mergeVideos, normaliseHandle, parseFeed } from "../src/lib/youtube-feed.mjs";
+import { extractChannelId, findCandidates, normaliseHandle, parseFeed } from "../src/lib/youtube-feed.mjs";
 
 const configPath = new URL("../public/config/videos.json", import.meta.url);
 const config = JSON.parse(readFileSync(configPath, "utf8"));
@@ -8,7 +8,7 @@ const headers = { "User-Agent": "Mozilla/5.0 (compatible; superheads-sync)", "Ac
 
 async function get(url) {
   const response = await fetch(url, { headers });
-  if (!response.ok) throw new Error(`${url} returned ${response.status}`);
+  if (!response.ok) throw new Error(`${url.split("?")[0]} returned ${response.status}`);
   return response;
 }
 
@@ -28,7 +28,6 @@ async function viaFeed() {
 
 const fetched = process.env.YOUTUBE_API_KEY ? await viaApi(process.env.YOUTUBE_API_KEY) : await viaFeed();
 if (!fetched.length) throw new Error("No videos found; leaving config unchanged");
-config.channel = { ...config.channel, handle: `@${handle}` };
-config.videos = mergeVideos(config.videos, fetched);
-writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
-console.log(`Synced ${config.videos.length} videos from @${handle}${process.env.YOUTUBE_API_KEY ? " (API)" : " (feed, latest 15 at most)"}.`);
+const candidates = findCandidates(config.videos, fetched);
+writeFileSync(new URL("../youtube-candidates.json", import.meta.url), JSON.stringify({ handle: `@${handle}`, candidates }, null, 2) + "\n");
+console.log(`Found ${candidates.length} new candidate videos from @${handle}${process.env.YOUTUBE_API_KEY ? " (API)" : " (feed, latest 15 at most)"}. Review youtube-candidates.json; ${configPath.pathname} was not changed.`);
