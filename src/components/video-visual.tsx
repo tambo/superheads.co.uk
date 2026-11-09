@@ -82,8 +82,6 @@ export default function VideoVisual({ video, paused, revision, muted, overlayEna
       const initialVideo = videoRef.current;
       const target = document.createElement("iframe");
       target.title = `YouTube video: ${initialVideo.title}`;
-      target.width = "100%";
-      target.height = "100%";
       target.referrerPolicy = "strict-origin-when-cross-origin";
       target.allow = "autoplay; encrypted-media; picture-in-picture; web-share";
       target.allowFullscreen = true;
