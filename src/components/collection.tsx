@@ -149,7 +149,7 @@ export default function Collection() {
   }, [state.autoVisuals, state.paused, state.context, state.slot, visualCount]);
 
   useEffect(() => {
-    if (!state.automaticVisual && wantsAudio && state.musicTracks.length && !audioLevels.playing) dispatch({ type: "audio-track", slot: state.audioIndex });
+    if (!state.automaticVisual && !audioInputActive && wantsAudio && state.musicTracks.length && !audioLevels.playing) dispatch({ type: "audio-track", slot: state.audioIndex });
   }, [wantsAudio, videoUsesJukebox, state.automaticVisual, state.manualVisualRevision, state.musicTracks.length]);
 
   useEffect(() => {

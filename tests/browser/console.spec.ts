@@ -137,6 +137,11 @@ test("Lab audio input drives analyser only and can be stopped", async ({ page })
   await expect(audioToggle).toBeEnabled();
   await expect(audioToggle).toHaveAttribute("aria-label", "Pause audio");
   await expect.poll(() => page.locator("audio").evaluate(audio => (audio as HTMLAudioElement).paused)).toBe(false);
+  await page.getByRole("button", { name: "Stop audio", exact: true }).click();
+  await page.locator(".pad-2").click();
+  await page.locator(".pad-3").click();
+  await expect(page.locator(".pad-3")).toHaveAttribute("aria-pressed", "true");
+  expect(await page.locator("audio").evaluate((audio: HTMLAudioElement) => ({ paused: audio.paused, time: audio.currentTime }))).toEqual({ paused: true, time: 0 });
   await page.getByRole("button", { name: "Audio input: USB Microphone" }).click();
   const selectedInput = page.getByRole("group", { name: "Audio input devices" }).getByRole("button", { name: "USB Microphone" });
   const optionLayout = await selectedInput.evaluate(option => {
