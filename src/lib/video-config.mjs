@@ -52,6 +52,6 @@ export function videoFilterStyle(levels, filter = {}) {
   const { hue = 0, saturate = 0, contrast = 0, brightness = 0, scale = 0 } = filter;
   return {
     filter: `hue-rotate(${(levels.mid * hue).toFixed(1)}deg) saturate(${(1 + levels.level * saturate).toFixed(3)}) contrast(${(1 + levels.bass * contrast).toFixed(3)}) brightness(${(1 + levels.bass * brightness).toFixed(3)})`,
-    transform: `translate(-50%, -50%) scale(${(1 + levels.bass * scale).toFixed(4)})`,
+    transform: `scale(${(1 + levels.bass * scale).toFixed(4)})`,
   };
 }
