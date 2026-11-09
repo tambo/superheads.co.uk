@@ -20,7 +20,7 @@ test("filter style responds to audio", () => {
   const quiet = videoFilterStyle({ bass: 0, mid: 0, treble: 0, level: 0 }, { scale: 0.1 });
   const loud = videoFilterStyle({ bass: 1, mid: 1, treble: 1, level: 1 }, { scale: 0.1 });
   assert.notEqual(quiet.transform, loud.transform);
-  assert.match(loud.transform, /translate/);
+  assert.match(loud.transform, /^scale\(1\.\d+\)$/);
 });
 
 test("overlay source declares audio uniforms", () => {
