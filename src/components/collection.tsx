@@ -77,7 +77,6 @@ function Visual({ slot, paused, revision }: { slot: number; paused: boolean; rev
 
 export default function Collection() {
   const [state, dispatch] = useReducer(consoleReducer, initialState);
-  const [introActive, setIntroActive] = useState(true);
   const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
   const [videoAudioSource, setVideoAudioSource] = useState<"video" | "jukebox">("video");
   const [videoShaderEnabled, setVideoShaderEnabled] = useState(false);
@@ -100,8 +99,7 @@ export default function Collection() {
   const suspendJukebox = state.context === "videos" && videoAudioSource === "video";
   const selected = items[state.slot] || (state.context === "music" ? "Tomaz Sounder" : context.label);
   const section = sections.find(item => item.context === state.context || item.submenu.includes(state.context))!;
-  const renderPad = (slot: number) => <button key={slot} className={`pad pad-${slot}`} disabled={!items[slot]} aria-pressed={!introActive && Boolean(items[slot]) && state.slot === slot} aria-keyshortcuts={padKeys[slot].toUpperCase()} aria-label={items[slot] ? `${slot + 1}, ${padKeys[slot].toUpperCase()}: ${items[slot]}` : `${slot + 1}, ${padKeys[slot].toUpperCase()}: empty`} title={`${slot + 1} / ${padKeys[slot].toUpperCase()}${items[slot] ? `: ${items[slot]}` : ""}`} onClick={() => { setIntroActive(false); dispatch({ type: "slot", slot }); }}><small>{slot + 1}</small><span>{padKeys[slot].toUpperCase()}</span></button>;
-  const renderIntroPad = (slot: number) => <button key={slot} className={`pad intro-placeholder-control pad-${slot}`} type="button" disabled tabIndex={-1} aria-hidden="true" />;
+  const renderPad = (slot: number) => <button key={slot} className={`pad pad-${slot}`} disabled={!items[slot]} aria-pressed={Boolean(items[slot]) && state.slot === slot} aria-keyshortcuts={padKeys[slot].toUpperCase()} aria-label={items[slot] ? `${slot + 1}, ${padKeys[slot].toUpperCase()}: ${items[slot]}` : `${slot + 1}, ${padKeys[slot].toUpperCase()}: empty`} title={`${slot + 1} / ${padKeys[slot].toUpperCase()}${items[slot] ? `: ${items[slot]}` : ""}`} onClick={() => dispatch({ type: "slot", slot })}><small>{slot + 1}</small><span>{padKeys[slot].toUpperCase()}</span></button>;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -142,13 +140,13 @@ export default function Collection() {
     return () => controller.abort();
   }, []);
 
-  const wantsAudio = !introActive && ((state.context === "lab" && Boolean(shaders[state.slot]?.playAudio)) || (videoUsesJukebox && videos.length > 0));
+  const wantsAudio = ((state.context === "lab" && Boolean(shaders[state.slot]?.playAudio)) || (videoUsesJukebox && videos.length > 0));
   useEffect(() => {
-    if (introActive || !state.autoVisuals || state.paused || !visualContext || visualCount < 2) return;
+    if (!state.autoVisuals || state.paused || !visualContext || visualCount < 2) return;
     const next = randomVisualStep(state.slot, visualCount);
     const timer = window.setTimeout(() => dispatch({ type: "slot", slot: next.slot, automatic: true }), next.delay);
     return () => window.clearTimeout(timer);
-  }, [introActive, state.autoVisuals, state.paused, state.context, state.slot, visualCount]);
+  }, [state.autoVisuals, state.paused, state.context, state.slot, visualCount]);
 
   useEffect(() => {
     if (!state.automaticVisual && wantsAudio && state.musicTracks.length && !audioLevels.playing) dispatch({ type: "audio-track", slot: state.audioIndex });
@@ -191,12 +189,10 @@ export default function Collection() {
       const target = event.target as HTMLElement | null;
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || target?.closest("input, textarea, select, [contenteditable='true'], [role='textbox']")) return;
       if (event.key === " " && target?.closest("button, a")) return;
-      if (introActive && (event.key === " " || event.key === "Backspace" || event.key === "Escape")) return;
       const action = keyboardAction(event.key);
       if (!action || (action.type === "pause" && !visualContext)) return;
       if (action.type === "auto-visuals" && (!visualContext || visualCount < 2)) return;
       if ((action.type === "video-audio" || action.type === "video-overlay") && state.context !== "videos") return;
-      if (introActive && (action.type === "context" || action.type === "slot")) setIntroActive(false);
       event.preventDefault();
       if (action.type === "fullscreen") fullscreenButtonRef.current?.click();
       else if (action.type === "video-audio") videoAudioButtonRef.current?.click();
@@ -205,15 +201,10 @@ export default function Collection() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state.context, pseudoFullscreen, visualCount, visualContext, introActive]);
-
-  const changeContext = (identifier: string) => {
-    setIntroActive(false);
-    dispatch({ type: "context", context: identifier });
-  };
+  }, [state.context, pseudoFullscreen, visualCount, visualContext]);
 
   return <main className="console">
-    <a className="skip" href={introActive ? "#main-display" : "#control-bank"}>Skip to {introActive ? "main display" : "content controls"}</a>
+    <a className="skip" href="#control-bank">Skip to content controls</a>
     <header className="identity">
       <div className="identity-copy">
       <h1><img src="/artwork/home/4.svg" alt="superheads" width="145" height="27" /></h1>
@@ -236,16 +227,13 @@ export default function Collection() {
     <section className="screen-section" id="main-display" aria-label="Main display">
       <div className={pseudoFullscreen ? "display pseudo-fullscreen" : "display"} ref={displayRef}>
         {pseudoFullscreen && <button className="exit-fullscreen" aria-label="Exit fullscreen" title="Exit fullscreen - Escape" onClick={() => setPseudoFullscreen(false)}><Minimize /></button>}
-            {introActive ? <video className="intro-video" src="/video/suzanna_intro.mp4" autoPlay muted playsInline preload="auto" aria-label="Superheads introduction" onEnded={() => { setIntroActive(false); changeContext("lab"); }} /> : state.context === "videos" && videos.length ? <VideoVisual video={videos[state.slot] || videos[0]} paused={state.paused} revision={state.revision} muted={videoUsesJukebox} overlayEnabled={videoShaderActive} /> : state.context === "lab" && shaders.length ? <ShaderVisual shader={shaders[state.slot] || shaders[0]} paused={state.paused} revision={state.revision} crossfade={state.automaticVisual} /> : state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
+            {state.context === "videos" && videos.length ? <VideoVisual video={videos[state.slot] || videos[0]} paused={state.paused} revision={state.revision} muted={videoUsesJukebox} overlayEnabled={videoShaderActive} /> : state.context === "lab" && shaders.length ? <ShaderVisual shader={shaders[state.slot] || shaders[0]} paused={state.paused} revision={state.revision} crossfade={state.automaticVisual} /> : state.context === "lab" ? <Visual slot={state.slot} paused={state.paused} revision={state.revision} /> : <div className="display-copy">
           <span className="eyebrow">{context.label}</span>
           <h2>{selected}</h2>
           <p>{state.context === "music" ? artist.excerpt : state.context === "videos" ? "No videos are configured yet. Run the YouTube sync to fill this section." : section.id === "community" ? "The original community service has not been restored." : "Original collection entry. Legacy playback is not yet restored."}</p>
         </div>}
       </div>
-      {introActive ? <div className="transport intro-transport" aria-hidden="true">
-        <span className="intro-placeholder-line" />
-        <div>{Array.from({ length: 4 }, (_, index) => <button key={index} className="intro-placeholder-control" type="button" disabled tabIndex={-1} aria-hidden="true" />)}</div>
-      </div> : <div className="transport">
+      <div className="transport">
         <span aria-live="polite">{selected}{state.context === "lab" && <small>{shaders.length ? " / shader" : " / visual study"}</small>}{state.context === "videos" && videos.length > 0 && <small> / {videos[state.slot]?.effect.name}</small>}</span>
         <div>
           <button aria-label={state.paused ? "Play visual" : "Pause visual"} title="Play / pause - Space" disabled={!visualContext || (state.context === "videos" && !videos.length)} onClick={() => dispatch({ type: "pause" })}>{state.paused ? <Play /> : <Pause />}</button>
@@ -263,34 +251,21 @@ export default function Collection() {
             <button ref={videoOverlayButtonRef} aria-label="Shader overlay" aria-keyshortcuts={"\\"} aria-pressed={videoShaderActive} title={videoUsesJukebox ? "Toggle shader overlay - \\" : "Shader overlay - \\ - select Jukebox audio to enable"} disabled={!videoUsesJukebox} onClick={() => setVideoShaderEnabled(value => !value)}><Sparkles /></button>
           </>}
         </div>
-      </div>}
+      </div>
     </section>
     <aside className="navigation">
       <nav className="section-tiles" aria-label="Main sections">
-        {sections.map(item => <button key={item.id} aria-pressed={!introActive && section.id === item.id} onClick={() => { setIntroActive(false); dispatch({ type: "section", section: item.id }); }}>{item.label.toUpperCase()}</button>)}
+        {sections.map(item => <button key={item.id} aria-pressed={section.id === item.id} onClick={() => dispatch({ type: "section", section: item.id })}>{item.label.toUpperCase()}</button>)}
       </nav>
-      {introActive ? <div className="intro-context-placeholders" aria-hidden="true">
-        <span className="intro-placeholder-line" />
-        <div className="context-tiles">{Array.from({ length: 4 }, (_, index) => <button key={index} className="intro-placeholder-control" type="button" disabled tabIndex={-1} />)}</div>
-      </div> : <>
       <p className="context-description">{context.description}</p>
       <nav className="context-tiles" aria-label="Context Navigation">
         {section.submenu.map(identifier => {
           const item = contexts.find(context => context.id === identifier)!;
-          return <button key={item.id} aria-pressed={state.context === item.id} onClick={() => changeContext(item.id)}><ArrowDownRight aria-hidden="true" /><span>{item.id === "lab" ? "LAB" : item.label.toUpperCase()}</span></button>;
+          return <button key={item.id} aria-pressed={state.context === item.id} onClick={() => dispatch({ type: "context", context: item.id })}><ArrowDownRight aria-hidden="true" /><span>{item.id === "lab" ? "LAB" : item.label.toUpperCase()}</span></button>;
         })}
       </nav>
-      </>}
     </aside>
-      {introActive ? <section className="control-section intro-control-section" aria-hidden="true">
-        <div className="bank-heading"><span className="intro-placeholder-line" /><span className="intro-placeholder-line" /></div>
-        <div className="pad-bank lab-keyboard intro-keyboard">
-          <div className="pad-row pad-row-top">{Array.from({ length: 10 }, (_, slot) => renderIntroPad(slot))}</div>
-          <div className="pad-row pad-row-bottom">{Array.from({ length: 9 }, (_, index) => renderIntroPad(index + 10))}</div>
-          <div className="pad-row pad-row-third">{Array.from({ length: 7 }, (_, index) => renderIntroPad(index + 19))}</div>
-        </div>
-        <p className="album"><span className="intro-placeholder-line" /><br /><span className="intro-placeholder-line" /></p>
-      </section> : <section className="control-section" id="control-bank" aria-label="Content controls">
+      <section className="control-section" id="control-bank" aria-label="Content controls">
       <div className="bank-heading"><h2>{context.label.toUpperCase()}</h2><span>{selected.toUpperCase()}</span></div>
       <div className={visualContext ? "pad-bank lab-keyboard" : "pad-bank"} aria-label="Keyboard content pads">
         <div className="pad-row pad-row-top">{Array.from({ length: 10 }, (_, slot) => renderPad(slot))}</div>
@@ -298,6 +273,6 @@ export default function Collection() {
         {visualContext && <div className="pad-row pad-row-third">{Array.from({ length: 7 }, (_, index) => renderPad(index + 19))}</div>}
       </div>
       <p className="album">{state.context === "music" ? "artist:" : "from the album:"}<br /><em>{state.context === "music" ? artist.title : "a senseless act of beauty"}</em></p>
-    </section>}
+    </section>
   </main>;
 }
